@@ -1,0 +1,100 @@
+clc
+clear all
+close all
+
+%TrivialEstimate_2
+
+R_t = 2; %Fixed R_t
+
+w_s = [0.1 0.2 0.3 0.2 0.1 0.05 0.03 0.02]; %Serial interval, e.g. odds
+...of infecting after 2 days is 0.2.
+
+w_s = [1 0 0 0 0 0];
+
+total_time = 40; %Therefore total time+1 total pieces of data, since I_0
+...is at time = 0.
+
+days = 0:total_time;
+
+tau = 5; %time that we sample over to get R_t estimate
+
+%Gamma distribution parameters
+
+a = 1; %This is by solving for mean=5 and stdev=5
+b = 5;
+
+%Initial incidence
+I_0 = 1
+I = I_0;
+
+%Generate incidence data
+
+%Incidence_Generator_2 takes the whole time series data for I, extracts the
+%most recent (last 8 days in this case) incidence reports and then computes
+%the dot product with the serial. [The serial is reversed before taking the
+%dot product]
+
+for t = 1:total_time
+   
+    I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s));
+    I = [I, I_new];
+    
+end
+
+shape = zeros(1, total_time+1);
+scale = zeros(1, total_time+1);
+mean = zeros(1, total_time+1);
+upper = zeros(1, total_time+1);
+lower = zeros(1, total_time+1);
+
+for t = tau+1:total_time+1 %tau+1 (Day tau) is the first you can start 
+    ...from. t is the index, NOT the day.
+   
+    shape(t) = a + sum(I(t-tau:t)); %shape param at time t = i
+    scale(t) = 0;
+    
+    for k  = t-tau:t %Index t-tau to t, i.e. day t-tau-1 to t-1
+        
+        I_switch = I(1:k); %definitely want from k down, may want all 
+        ...the way down to 1
+        
+        scale(t) = scale(t) + Incidence_Generator_2(I_switch, w_s); %Takes 
+        ...I_k, I_{k-1} down to length of Serial
+
+    end
+    
+    scale(t) = 1/(scale(t)+(1/b));
+    
+    mean(t) = scale(t)*shape(t); %Mean of gamma distn is product of two 
+    ...pars
+    
+    upper(t) = gaminv(0.995, shape(t), scale(t));
+    
+    lower(t) = gaminv(0.005, shape(t), scale(t));
+    
+end
+
+figure(1)
+% plot(days, upper)
+% hold on
+% plot(days, lower)
+plot(days, mean)
+
+hold on
+daysflip = [days, fliplr(days)];
+inBetween = [lower, fliplr(upper)];
+I_switch = fill(daysflip, inBetween, 'r', 'FaceAlpha', 0.25, 'edgealpha', 0);
+title({['Trivial $R_t$ (=', num2str(R_t), ') estimate with'];['$w_s = [$',num2str(w_s), ']']})
+ylabel('$\bar{R}_t$')
+xlabel('Time, $t$ (days)')
+
+figure(2)
+plot(days, I)
+title('Simulated incidence data')
+ylabel('Incidence')
+xlabel('Time, $t$ (days)')
+
+figure(3)
+plot(0:7, w_s)
+hold on
+plot(days, dot(w_s, [0 1 2 3 4 5 6 7])*R_t)
