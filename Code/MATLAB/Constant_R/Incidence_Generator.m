@@ -1,4 +1,4 @@
-function Gamma = Incidence_Generator(I_data, Serial) %
+function Lambda = Incidence_Generator(I_data, Serial) %
     
     length_I = length(I_data);
     
@@ -14,6 +14,6 @@ function Gamma = Incidence_Generator(I_data, Serial) %
         
     end
 
-    Gamma = dot(I_recent, Serial);
+    Lambda = dot(I_recent, Serial);
 
 end

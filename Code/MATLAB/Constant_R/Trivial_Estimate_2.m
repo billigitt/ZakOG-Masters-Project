@@ -149,12 +149,12 @@ xlabel('Time, $t$ (days)')
 
 legend(h([1 2]), '$\bar{R}_t$', '95\% Confidence Interval')
 
-Printer = 1;
+Printer = 0;
 
 if Printer == 1
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-saveas(gcf, 'Trivial_Estimate_CI.pdf')
+saveas(gcf, 'Trivial_Estimate_CI.eps')
 
 export_fig Trivial_Estimate_CI.pdf -pdf -r1500 -opengl
 
@@ -172,7 +172,7 @@ xlabel('Time, $t$ (days)')
 if Printer == 1
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-saveas(gcf, 'Trivial_Estimate_Incidence.eps')
+saveas(gcf, 'Trivial_Estimate_Incidence')
 
 export_fig Trivial_Estimate_Incidence.eps -eps -r300 -painters -transparent
 
@@ -187,7 +187,7 @@ xlabel('Time, $t$ (days)')
 if Printer == 1
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-saveas(gcf, 'Trivial_Estimate_Certain_Serial.eps')
+saveas(gcf, 'Trivial_Estimate_Certain_Serial')
 
 export_fig Trivial_Estimate_Certain_Serial.eps -eps -r300 -painters -transparent
 
