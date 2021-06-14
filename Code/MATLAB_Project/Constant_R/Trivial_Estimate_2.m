@@ -10,6 +10,10 @@ set(0, 'defaultlinelinewidth', 2)
 set(0,'DefaultTextInterpreter', 'latex')
 set(0,'defaultAxesTickLabelInterpreter','latex');
 set(0, 'defaultLegendInterpreter','latex')
+C  = [0.3686 0.3098 0.6353; 0.2005 0.5593 0.7380; 0.4558 0.7897 0.6458;...
+    0.8525 0.2654 0.3082; 0.6196 0.0039 0.2588];
+addpath('../Functions', '~/Documents/MATLAB/export_fig')  
+savepath ../Functions/pathdef.m
 
 %% Run TrivialEstimate_2
 
@@ -123,44 +127,99 @@ clf
 
 %Plot Mean
 
-h(1) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
+daysflip = [tau:total_time, total_time:-1:tau];
+inBetween = [Lower(tau+1:total_time+1), fliplr(Upper(tau+1:total_time+1))];
+h(1) = fill(daysflip, inBetween, [.75 .75 .75], 'LineWidth', 0.1, ...
+    'edgecolor', [1 1 1]);
+
 hold on
+
+h(2) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
 
 %Plot Prior 95% CI. Useful when looking at failed epidemic
 
-plot([days(1) days(end)], [gaminv(0.6, a, b) gaminv(0.60, a, b)], 'b--')
-plot([days(1) days(end)], [gaminv(0.4, a, b) gaminv(0.40, a, b)], 'b--')
+plot([days(1) days(end)], [gaminv(0.975, a, b) gaminv(0.975, a, b)], 'color', C(2, :), 'LineStyle', '--')
+h(3) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'color', C(2, :), 'LineStyle', '--');
 % plot([days(1) days(end)], [a*b a*b], 'b--')
 
 %Plot ongoing 95% CI
 
-daysflip = [tau:total_time, total_time:-1:tau];
-inBetween = [Lower(tau+1:total_time+1), fliplr(Upper(tau+1:total_time+1))];
-h(2) = fill(daysflip, inBetween, 'k', 'FaceAlpha', 0.25, ...
-    'edgealpha', 0);
+
 %Labels
 
 title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
-    ['$w_s = [$',num2str(w_s), ']']})
+    ['$w_s = [0$ ',num2str(w_s), '] \& $\tau=$ ', num2str(tau), ' days']})
 ylabel('$\bar{R}_t$')
 xlabel('Time, $t$ (days)')
 
 %Legend
 
-legend(h([1 2]), '$\bar{R}_t$', '95\% Confidence Interval')
+% legend(h([2]), '95 \% Confidence Interval')
 
-Printer = 0;
+legend(h([2 1 3]), '$\bar{R}_t$', '95 \% Posterior CI', '95 \% Prior CI')
+
+Printer = 1;
 
 if Printer == 1
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
 saveas(gcf, 'Trivial_Estimate_CI.eps')
 
-export_fig Trivial_Estimate_CI.pdf -pdf -r1500 -opengl
+export_fig Trivial_Estimate_CI.eps -eps -r300 -painters -transparent
 
 end
 
 figure(2)
+clf
+
+%Plot Mean
+
+daysflip = [tau:total_time, total_time:-1:tau];
+inBetween = [Lower(tau+1:total_time+1), fliplr(Upper(tau+1:total_time+1))];
+h(1) = fill(daysflip, inBetween, [.75 .75 .75], 'LineWidth', 0.1, ...
+    'edgecolor', [1 1 1]);
+
+hold on
+
+h(2) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
+
+%Plot Prior 95% CI. Useful when looking at failed epidemic
+
+plot([days(1) days(end)], [gaminv(0.975, a, b) gaminv(0.975, a, b)], 'color', C(2, :), 'LineStyle', '--')
+h(3) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'color', C(2, :), 'LineStyle', '--');
+% plot([days(1) days(end)], [a*b a*b], 'b--')
+
+%Plot ongoing 95% CI
+
+
+%Labels
+
+title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
+    ['$w_s = [0$ ',num2str(w_s), '] \& $\tau=$ ', num2str(tau)', ' days']})
+ylabel('$\bar{R}_t$')
+xlabel('Time, $t$ (days)')
+
+%Legend
+
+% legend(h([2]), '95 \% Confidence Interval')
+
+legend(h([2 1 3]), '$\bar{R}_t$', '95 \% Posterior CI')
+0
+axis([0 78 1.5 2.8])
+
+Printer = 1;
+
+if Printer == 1
+%Save figure
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
+saveas(gcf, 'Trivial_Estimate_CI_Zoom.eps')
+
+export_fig Trivial_Estimate_CI_Zoom.eps -eps -r300 -painters -transparent
+
+end
+
+
+figure(3)
 clf
 h(1) = bar(days, I, 'FaceColor', [.5 .5 .5]);
 % hold on
@@ -175,21 +234,6 @@ set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centime
 saveas(gcf, 'Trivial_Estimate_Incidence')
 
 export_fig Trivial_Estimate_Incidence.eps -eps -r300 -painters -transparent
-
-end
-
-figure(3)
-plot(0:8, [0 w_s], 'k')
-title('Serial Interval (zero uncertainty)')
-ylabel('Probability')
-xlabel('Time, $t$ (days)')
-
-if Printer == 1
-%Save figure
-set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-saveas(gcf, 'Trivial_Estimate_Certain_Serial')
-
-export_fig Trivial_Estimate_Certain_Serial.eps -eps -r300 -painters -transparent
 
 end
 

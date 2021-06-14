@@ -12,6 +12,9 @@ set(0,'defaultAxesTickLabelInterpreter','latex');
 set(0, 'defaultLegendInterpreter','latex')
 C  = [0.3686 0.3098 0.6353; 0.2005 0.5593 0.7380; 0.4558 0.7897 0.6458;...
     0.8525 0.2654 0.3082; 0.6196 0.0039 0.2588];
+addpath('../Functions', '~/Documents/MATLAB/export_fig')  
+savepath ../Functions/pathdef.m
+
 %% Run Vary_R_Estimate
 
 %Set seed
@@ -31,7 +34,7 @@ R_t = 0.75 + 3*exp(-0.25*days);
 w_s = [0 0.1 0.2 0.3 0.2 0.1 0.05 0.03 0.02]; %Serial interval, e.g. odds
 ...of infecting after 1 days is 1/3.
 
-writematrix(w_s,'Trivial_Serial.csv') %For comparison to EpiEstim
+writematrix(w_s,'Variable_Serial.csv') %For comparison to EpiEstim
 
 w_s(1) = []; %Delete since our algorithm knows that probability of 
 ...serial=0 is 0.
@@ -66,7 +69,7 @@ for t = 1:total_time
     
 end
 
-writematrix(I','Trivial_Data.csv') %For comparison to EpiEstim
+writematrix(I','Variable_Data.csv') %For comparison to EpiEstim
 
 Shape = zeros(1, total_time+1);
 Scale = zeros(1, total_time+1);
@@ -118,15 +121,15 @@ clf
 
 %Plot Mean
 
-h(1) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
-hold on
-
-
-
 daysflip = [tau:total_time, total_time:-1:tau];
 inBetween = [Lower(tau+1:total_time+1), fliplr(Upper(tau+1:total_time+1))];
-h(2) = fill(daysflip, inBetween, 'k', 'FaceAlpha', 0.25, ...
-    'edgealpha', 0);
+h(1) = fill(daysflip, inBetween, [0.75 .75 .75] , 'LineWidth', 0.1, ...
+    'edgecolor', [1 1 1]);
+
+hold on
+
+h(2) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
+
 h(3) = plot(days, R_t, 'color', C(4, :));
 %Labels
 
@@ -135,13 +138,13 @@ h(4) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'col
 % plot([days(1) days(end)], [a*b a*b], 'b--')
 
 title({['$R_t$ inference with'];...
-    ['$w_s = [$',num2str(w_s), ']']})
+    ['$w_s = [0$ ',num2str(w_s), '] \& $\tau =$ ', num2str(tau), ' days']})
 ylabel('$\bar{R}_t$')
 xlabel('Time, $t$ (days)')
 
 %Legend
 
-legend(h([1 2 3]), '$\bar{R}_t$', '95\% confidence interval', 'True $R_t(t) = 0.75 + 3e^{-0.25t}$', 'Location', 'West')
+legend(h([2 1 3 4]), '$\bar{R}_t$', '95\% Posterior CI', 'True $R_t(t) = 0.75 + 3e^{-0.25t}$', '95 \% Prior CI', 'Location', 'West')
 
 Printer = 1;
 
@@ -150,21 +153,24 @@ if Printer == 1
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
 saveas(gcf, 'Variable_Estimate_CI.eps')
 
-export_fig Variable_Estimate_CI.pdf -pdf -r1500 -opengl
+export_fig Variable_Estimate_CI.eps -eps -r300 -painters -transparent
 
 end
 
 figure(2)
 clf
-%Plot Mean
 
-h(1) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
-hold on
+%Plot Mean
 
 daysflip = [tau:total_time, total_time:-1:tau];
 inBetween = [Lower(tau+1:total_time+1), fliplr(Upper(tau+1:total_time+1))];
-h(2) = fill(daysflip, inBetween, 'k', 'FaceAlpha', 0.25, ...
-    'edgealpha', 0);
+h(1) = fill(daysflip, inBetween, [0.75 .75 .75] , 'LineWidth', 0.1, ...
+    'edgecolor', [1 1 1]);
+
+hold on
+
+h(2) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
+
 h(3) = plot(days, R_t, 'color', C(4, :));
 %Labels
 
@@ -173,14 +179,13 @@ h(4) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'col
 % plot([days(1) days(end)], [a*b a*b], 'b--')
 
 title({['$R_t$ inference with'];...
-    ['$w_s = [$',num2str(w_s), ']']})
+    ['$w_s = [0$ ',num2str(w_s), '] \& $\tau =$ ', num2str(tau), ' days']})
 ylabel('$\bar{R}_t$')
 xlabel('Time, $t$ (days)')
 
 %Legend
 
-legend(h([1 2 3]), '$\bar{R}_t$', '95\% confidence interval', 'True $R_t(t) = 0.75 + 3e^{-0.25t}$', 'Location', 'North')
-
+legend(h([2 1 3 4]), '$\bar{R}_t$', '95\% confidence interval', 'True $R_t(t) = 0.75 + 3e^{-0.25t}$', '95 \% CI for $\mathrm{Beta}(1, 5)$ prior', 'Location', 'Best')
 axis([0 60 0 4])
 
 if Printer == 1
@@ -188,7 +193,7 @@ if Printer == 1
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
 saveas(gcf, 'Variable_Estimate_CI_Zoom.eps')
 
-export_fig Variable_Estimate_CI_Zoom.pdf -pdf -r1500 -opengl
+export_fig Variable_Estimate_CI_Zoom.eps -eps -r300 -painters -transparent
 
 end
 
@@ -223,7 +228,7 @@ if Printer == 1
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
 saveas(gcf, 'Variable_Estimate_Certain_Serial.eps')
 
-export_fig Var_Estimate_Certain_Serial.eps -eps -r300 -painters -transparent
+export_fig Variable_Estimate_Certain_Serial.eps -eps -r300 -painters -transparent
 
 end
 
@@ -271,8 +276,8 @@ xlabel('Time, $t$ (days)')
 if Printer == 1
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 30 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-saveas(gcf, 'Trivial_Estimate_parameter_Comparison.eps')
+saveas(gcf, 'Variable_Estimate_parameter_Comparison.eps')
 
-export_fig Trivial_Estimate_theta_Comparison.eps -eps -r300 -painters -transparent
+export_fig Variable_Estimate_parameter_Comparison.eps -eps -r300 -painters -transparent
 
 end
