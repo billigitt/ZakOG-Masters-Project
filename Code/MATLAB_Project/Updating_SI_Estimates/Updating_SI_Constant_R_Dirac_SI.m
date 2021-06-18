@@ -15,28 +15,33 @@ C  = [0.3686 0.3098 0.6353; 0.2005 0.5593 0.7380; 0.4558 0.7897 0.6458;...
 addpath('../Functions', '~/Documents/MATLAB/export_fig')  
 savepath ../Functions/pathdef.m
 
-%% Run TrivialEstimate_2
+%% Run Updating_SI_Constant_R_Dirac
 
 %Set seed
 
 rng(1996)
 
-total_time = 70; %Therefore total time+1 total pieces of data, since I_0
+total_time = 80; %Therefore total time+1 total pieces of data, since I_0
 ...is at time = 0.
 
 days = 0:total_time;
 
-%Fixed R_t
+%Sinusoidal R_t
 
-R_t = 2; 
+R_t = 2;
 
+w_s_o = [0 0.15 0.17 0.18 0.15 0.1 0.08 0.05 0.03 0.02 0.015 0.012...
+    0.010 0.009 0.008 0.008 0.008]; %Original serial interval- gamma shaped
+    
+w_s_u = zeros(1, length(w_s_o));
 
-w_s = [0 0.1 0.2 0.3 0.2 0.1 0.05 0.03 0.02]; %Serial interval, e.g. odds
-...of infecting after 1 days is 1/3.
+w_s_u(end) = 1; %Dirac delta
 
-writematrix(w_s,'Trivial_Serial.csv') %For comparison to EpiEstim
+w_s_t = zeros(total_time+1, length(w_s_o));
 
-w_s(1) = []; %Delete since our algorithm knows that probability of 
+%%
+
+w_s_o(1) = []; %Delete since our algorithm knows that probability of 
 ...serial=0 is 0.
 
 
@@ -49,33 +54,31 @@ a = 1; %This is by solving for mean=5 and stdev=5
 b = 5;
 
 %Initial incidence
-I_0 = 10;
+I_0 = 1000;
 I = I_0;
 
 %Generate incidence data
 
-%Incidence_Generator_2 takes the whole time series data for I, extracts the
-%most recent (last 8 days in this case) incidence reports and then computes
-%the dot product with the serial. [The serial is reversed before taking the
-%dot product]
-
-%Constant R_t
+%Here we generate incidence data using the initial w_s_o only. Notice that
+%we do not update the w_s value. This is because we want to predict how
+%wrong our inference will be, namely that it will tend to having a lag of
+%16 days. Meanwhile, we generate our serial interval as a weighted average
+%(according to the time dissipated from when data was generated until the 
+%end).
 
 for t = 1:total_time
    
-    I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s));
+    w_s_t(t+1, :) = (t*w_s_u +(total_time-t)*[0 w_s_o])/total_time;
+    
+    I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s_t(t, :))); 
 
 %     I_new = R_t*Incidence_Generator_2(I,w_s); %Determinstic data
 % %     generation
     I = [I, I_new];
     
+    
+    
 end
-
-
-
-writematrix(I','Trivial_Data.csv') %For comparison to EpiEstim
-
-
 
 Shape = zeros(1, total_time+1);
 Scale = zeros(1, total_time+1);
@@ -98,7 +101,7 @@ for t = tau+1:total_time+1 %tau+1 (Day tau) is the first you can start
         I_relevant = I(1:k); %definitely want from k down, may want all
         ...the way down to 1
         
-        Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, [0 w_s]); 
+        Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, w_s_t(k, :)); 
         %Takes I_k, I_{k-1} down to length of Serial
         %The 0 is included again. Previously it was ommitted, since then we
         %were *generating* the *following* day so we wanted the 'current'
@@ -147,18 +150,18 @@ h(3) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'col
 
 %Labels
 
-title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
-    ['$w_s = [$',num2str(w_s), '] \& $\tau=$ ', num2str(tau)]})
-ylabel('$\bar{R}_t$')
-xlabel('Time, $t$ (days)')
+% title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
+%     ['$w_s = [0$ ',num2str(w_s_o), '] \& $\tau=$ ', num2str(tau), ' days']})
+% ylabel('$\bar{R}_t$')
+% xlabel('Time, $t$ (days)')
 
 %Legend
 
 % legend(h([2]), '95 \% Confidence Interval')
 
-legend(h([2 1]), '$\bar{R}_t$', '95 \% Confidence Interval')
+legend(h([2 1 3]), '$\bar{R}_t$', '95 \% Posterior CI', '95 \% Prior CI', 'Location', 'Best')
 
-Printer = 1;
+Printer = 0;
 
 if Printer == 1
 %Save figure
@@ -189,25 +192,27 @@ plot([days(1) days(end)], [gaminv(0.975, a, b) gaminv(0.975, a, b)], 'color', C(
 h(3) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'color', C(2, :), 'LineStyle', '--');
 % plot([days(1) days(end)], [a*b a*b], 'b--')
 
+% h(4) = plot(days, R_t, 'color', C(3, :));
+% h(5) = plot(tau:max(days)+tau, R_t, 'color', C(4, :));
+
 %Plot ongoing 95% CI
 
 
 %Labels
 
-title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
-    ['$w_s = [$',num2str(w_s), '] \& $\tau=$ ', num2str(tau)']})
-ylabel('$\bar{R}_t$')
-xlabel('Time, $t$ (days)')
+% title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
+%     ['$w_s = [0$ ',num2str(w_s_o), '] \& $\tau=$ ', num2str(tau)', ' days']})
+% ylabel('$\bar{R}_t$')
+% xlabel('Time, $t$ (days)')
 
 %Legend
 
 % legend(h([2]), '95 \% Confidence Interval')
 
-legend(h([2 1 3]), '$\bar{R}_t$', '95 \% Posterior CI')
-0
-axis([0 78 1.5 2.8])
+legend(h([2 1 3]), '$\bar{R}_t$', '95 \% Posterior CI', 'Location', 'Best')
+axis([0 length(days) min(Mean(tau+1:total_time+1)) max(Mean(tau+1:total_time+1))])
 
-Printer = 1;
+Printer = 0;
 
 if Printer == 1
 %Save figure
@@ -237,67 +242,12 @@ export_fig Trivial_Estimate_Incidence.eps -eps -r300 -painters -transparent
 
 end
 
-%% Comparison to EpiEstim
-
-% Go to https://shiny.dide.imperial.ac.uk/epiestim/ and upload data as well
-% as downloading EstimatedR.csv to compare to shape and scale parameters
-% through time. The curves should lie exactly on top of one another.
-
-% data = readtable('EstimatedR.csv');
+%% Check that the mean serial time is line in growth- not that useful...
+% Days_In_Serial = 0:length(w_s_o);
 % 
-% mu = data.Mean_R_;
+% Weighted_Mean = w_s_t*Days_In_Serial';
 % 
-% sigma = data.Std_R_;
-% 
-% k = (mu.^2./sigma.^2);
-% theta = mu./k;
-% x = 0:0.001:6;
-% figure(5)
+% figure(4)
 % clf
-% plot(x, gampdf(x, k(end), theta(end)))
 % 
-% Printer = 0;
-% 
-% 
-% figure(6)
-% clf
-% h(1) = plot(k, 'g');
-% hold on
-% h(2) = plot(Shape(tau+1:end), 'b--');
-% title('Shape parameter comparison')
-% ylabel('$k$')
-% xlabel('Time, $t$ (days)')
-% legend(h([1 2]), 'EpiEstim', 'My inference', 'Location', 'NorthWest')
-% 
-% if Printer == 1
-% %Save figure
-% set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-% saveas(gcf, 'Trivial_Estimate_k_Comparison')
-% 
-% export_fig Trivial_Estimate_k_Comparison.eps -eps -r300 -painters -transparent
-% 
-% end
-% 
-% 
-% figure(7)
-% clf
-% h(1) = plot(theta, 'g');
-% hold on
-% h(2) = plot(Scale(tau+1:end), 'r--');
-% title('Scale parameter comparison')
-% ylabel('$\theta$')
-% xlabel('Time, $t$ (days)')
-% legend(h([1 2]), 'EpiEstim', 'My inference')
-% 
-% if Printer == 1
-% %Save figure
-% set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-% saveas(gcf, 'Trivial_Estimate_theta_Comparison')
-% 
-% export_fig Trivial_Estimate_theta_Comparison.eps -eps -r300 -painters -transparent
-% 
-% end
-
-%%Thoughts
-%why is my one one longer than theirs?
-%why do they use one less time pt for the summations (or appear to)?
+% plot(days, Weighted_Mean)

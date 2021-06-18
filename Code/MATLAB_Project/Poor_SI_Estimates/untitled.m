@@ -110,13 +110,13 @@ h(3) = plot([tau total_time], [1 1], 'k--', 'LineWidth', 1);
 % h(4) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'color', C(2, :), 'LineStyle', '--');
 % % plot([days(1) days(end)], [a*b a*b], 'b--')
 
-title({'Real-time $R_t$ inference of 1918 H1N1';['outbreak in Maryland, USA ($\tau =$ ', num2str(tau), '$)$']})
+title({'Real-time $R_t$ inference of 1918 H1N1';['outbreak in Maryland, USA ($\tau =$ ', num2str(tau), ' days$)$']})
 ylabel('$\bar{R}_t$')
 xlabel('Time, $t$ (days)')
 
 %Legend
 
-legend(h([1 2]), '$\bar{R}_t$', '95\% confidence interval', 'Location', 'Best')
+legend(h([1 2]), '$\bar{R}_t$', '95\% Posterior CI', 'Location', 'Best')
 
 Printer = 1;
 
@@ -148,13 +148,13 @@ h(3) = plot([tau total_time], [1 1], 'k--', 'LineWidth', 1);
 % h(4) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'color', C(2, :), 'LineStyle', '--');
 % % plot([days(1) days(end)], [a*b a*b], 'b--')
 
-title({'Real-time $R_t$ inference of 1918 H1N1';'outbreak in Maryland, USA ($\tau =$ ', num2str(tau), '$)$'})
+title({'Real-time $R_t$ inference of 1918 H1N1';['outbreak in Maryland, USA ($\tau =$ ', num2str(tau), ' days$)$']})
 ylabel('$\bar{R}_t$')
 xlabel('Time, $t$ (days)')
 
 %Legend
 
-legend(h([1 2]), '$\bar{R}_t$', '95\% confidence interval', 'Location', 'Best')
+legend(h([1 2]), '$\bar{R}_t$', '95\% Posterior CI', 'Location', 'Best')
 axis([0 total_time+tau 0 max(Upper)])
 
 if Printer == 1
@@ -173,7 +173,7 @@ clf
 h(1) = bar(days, I, 'FaceColor', [.5 .5 .5]);
 % hold on
 % plot(days, R_t.^days, 'r')
-title({'Incidence data for H1N1 outbreak in Maryland, USA ($\tau =$ ', num2str(tau), '$)$'})
+title('Incidence data for H1N1 outbreak in Maryland, USA')
 ylabel('Incidence')
 xlabel('Time, $t$ (days)')
 
