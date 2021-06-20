@@ -27,7 +27,7 @@ if isequal(Serial_Estimate, 'Perfect')
         R_t = para_extra.R_t;
 
         w_s_o(1) = [];
-
+        
         I = I_0;
 
         for t = 1:total_time
@@ -58,7 +58,7 @@ if isequal(Serial_Estimate, 'Perfect')
 
                 I_relevant = I(1:k); 
 
-                Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, w_s_t(k, :)); 
+                Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, [0 w_s_t(k, :)]); 
 
             end
 
@@ -93,7 +93,7 @@ elseif isequal(Serial_Estimate, 'Fixed')
 
         for t = 1:total_time
 
-            w_s_t(t+1, :) = (t*w_s_f +(total_time-t)*[0 w_s_o])/total_time;
+            w_s_t(t+1, :) = [0 w_s_o];
 
             I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s_t(t, :))); 
 
@@ -119,7 +119,7 @@ elseif isequal(Serial_Estimate, 'Fixed')
 
                 I_relevant = I(1:k); 
 
-                Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, w_s_o); 
+                Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, [0 w_s_o]); 
 
             end
 

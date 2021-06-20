@@ -32,27 +32,48 @@ w_s_o = pdf(trunc,x)/sum(pdf(trunc,x));
 
 w_s_o = [0 w_s_o];
 
+w_s_o = [0 0.1 0.2 0.3 0.2 0.1 0.05 0.03 0.02];
+
 w_s_f = w_s_o;
 
 % w_s_f(floor(0.7*N_o):end) = 0;
 % 
 % w_s_f = w_s_f/sum(w_s_f);
 
-tau = 7;
+tau = 8;
 
-para = struct('seed', 1997, 'total_time', 100, 'w_s_o', w_s_o, 'w_s_f', w_s_f, 'tau', tau, 'a', 5, 'b', 5, 'I_0', 10);
+para = struct('seed', 1996, 'total_time', 70, 'w_s_o', w_s_o, 'w_s_f', w_s_f, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 
 para_Trivial = struct('R_t', 2);
 
-[w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_update_SI('Fixed', 'Trivial', para, para_Trivial);
+[w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_update_SI_2('Fixed', 'Trivial', para, para_Trivial);
 
 figure(1)
 clf
 plot(I)
-clear all
+
 figure(2)
 clf
-plot(Mean, 'b')
-hold on
-[w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_update_SI('Perfect', 'Trivial', para, para_Trivial);
 plot(Mean, 'r')
+hold on
+[w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_update_SI_2('Perfect', 'Trivial', para, para_Trivial);
+plot(Mean, 'b')
+
+%% Now try for variable R_t
+
+%Input a function
+
+para_Variable = struct('R_t', @(x) 1.5 + sin(x));
+
+[w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_update_SI_2('Fixed', 'Variable', para, para_Variable);
+
+figure(3)
+clf
+plot(I)
+
+figure(4)
+clf
+plot(Mean, 'r')
+hold on
+[w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_update_SI_2('Perfect', 'Variable', para, para_Variable);
+plot(Mean, 'b')
