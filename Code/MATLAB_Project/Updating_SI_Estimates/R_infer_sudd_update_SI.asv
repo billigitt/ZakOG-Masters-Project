@@ -1,4 +1,4 @@
-function [w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_cont_update_SI(Serial_Estimate, I_Generation_Method, para, para_extra)
+function [w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_sudd_update_SI(Serial_Estimate, I_Generation_Method, para, para_extra)
 
 %This function evaluates the output variables using Bayesian inference
 %techniques. The key difference is how the data is generated and how
@@ -7,8 +7,10 @@ function [w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_cont_update_SI(S
 %Un-pack
 seed = para.seed;
 total_time = para.total_time;
-w_s_o = para.w_s_o; %Normal generated beforehand
-w_s_f = para.w_s_f; %Truncated normal generated beforehand
+w_s_all_actual = para.w_s_all_actual; %All serial intervals
+w_s_all_recorded = para.w_s_all_recorded;
+switch_behaviour = para.switch_behaviour;
+update_behaviour = para.update_behaviour;
 tau = para.tau;
 a = para.a;
 b = para.b;
@@ -16,10 +18,19 @@ I_0 = para.I_0;
 
 rng(seed) %Gives reproducible results
 
-w_s_t = zeros(total_time+1, length(w_s_o));
+w_s_actual = zeros(total_time+1, size(w_s_all_actual, 2));
 
-w_s_t(1, :) = w_s_o;
+w_s_recorded = zeros(total_time+1, size(w_s_all_actual, 2));
 
+w_s_actual(1:switch_behaviour(1), :) = w_s_all(1, :);
+
+for i = 1:size(w_s_all_actual)
+
+    w_s_actual(switch_behaviour(i), :) = w_s_all(i, :);
+    
+    
+
+end
 
 if isequal(I_Generation_Method, 'Trivial')
 

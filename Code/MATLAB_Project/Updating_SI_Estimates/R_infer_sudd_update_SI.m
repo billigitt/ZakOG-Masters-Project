@@ -1,4 +1,4 @@
-function [w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_cont_update_SI(Serial_Estimate, I_Generation_Method, para, para_extra)
+function [w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_sudd_update_SI(Serial_Estimate, I_Generation_Method, para, para_extra)
 
 %This function evaluates the output variables using Bayesian inference
 %techniques. The key difference is how the data is generated and how
@@ -7,8 +7,10 @@ function [w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_cont_update_SI(S
 %Un-pack
 seed = para.seed;
 total_time = para.total_time;
-w_s_o = para.w_s_o; %Normal generated beforehand
-w_s_f = para.w_s_f; %Truncated normal generated beforehand
+w_s_all_actual = para.w_s_all_actual; %All serial intervals
+w_s_all_recorded = para.w_s_all_recorded;
+switch_behaviour = para.switch_behaviour;
+update_behaviour = para.update_behaviour;
 tau = para.tau;
 a = para.a;
 b = para.b;
@@ -16,10 +18,25 @@ I_0 = para.I_0;
 
 rng(seed) %Gives reproducible results
 
-w_s_t = zeros(total_time+1, length(w_s_o));
+w_s_actual = zeros(total_time+1, size(w_s_all_actual, 2));
 
-w_s_t(1, :) = w_s_o;
+w_s_recorded = zeros(total_time+1, size(w_s_all_actual, 2));
 
+w_s_actual(1:switch_behaviour(1), :) = w_s_all(1, :);
+
+for i = 2:size(w_s_all_actual)
+
+    w_s_actual(switch_behaviour(i-1)+1:switch_behaviour(i), :) = w_s_all_actual(i, :);
+    
+end
+
+
+
+for i = 2:size(w_s_all_recorded)
+
+    w_s_actual(update_behaviour(i-1)+1:update_behaviour(i), :) = w_s_all_actual(i, :);
+    
+end
 
 if isequal(I_Generation_Method, 'Trivial')
 
@@ -31,9 +48,7 @@ if isequal(I_Generation_Method, 'Trivial')
     
     for t = 1:total_time
         
-        w_s_t(t+1, :) = (t*w_s_f +(total_time-t)*[w_s_o])/total_time;
-        
-        I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s_t(t, :)));
+        I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s_actual(t, :)));
         
         I = [I, I_new];
         
@@ -49,9 +64,7 @@ elseif isequal(I_Generation_Method, 'Variable')
     
     for t = 1:total_time
         
-        w_s_t(t+1, :) = (t*w_s_f +(total_time-t)*w_s_o)/total_time;
-        
-        I_new = poissrnd(R_t(t)*Incidence_Generator_2(I, w_s_t(t, :)));
+        I_new = poissrnd(R_t(t)*Incidence_Generator_2(I, w_s_actual(t, :)));
         
         I = [I, I_new];
         
@@ -82,7 +95,7 @@ if isequal(Serial_Estimate, 'Perfect')
             
             I_relevant = I(1:k);
             
-            Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, w_s_t(k, :));
+            Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, w_s_recorded(k, :));
             
         end
         
@@ -118,7 +131,7 @@ elseif isequal(Serial_Estimate, 'Fixed')
             
             I_relevant = I(1:k);
             
-            Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, w_s_o);
+            Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, w_s_recorded(1, :));
             
         end
         

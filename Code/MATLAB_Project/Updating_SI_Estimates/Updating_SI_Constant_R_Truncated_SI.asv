@@ -106,7 +106,7 @@ legend(h([1 2]), 'Fixed', 'Perfect', 'Location', 'Best')
 %% Now try for variable R_t
 
 %Input a function
-para = struct('seed', 196, 'total_time', 365*7, 'w_s_o', w_s_o, 'w_s_f', w_s_f, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
+para = struct('seed', 196, 'total_time', 365, 'w_s_o', w_s_o, 'w_s_f', w_s_f, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 para_Variable = struct('R_t', @(x) 2.0 + 1.5*sin(2*pi*x/365));
 
 [w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_cont_update_SI('Fixed', 'Variable', para, para_Variable);
@@ -134,15 +134,18 @@ w_s_all_recorded = [w_s_o; w_s_f; w_s_o; w_s_f; w_s_o; w_s_f; w_s_o];
 
 switch_behaviour = [30 50 70 110 160 165];
 
-update_behaviour = switch_behaviour+100;
+update_behaviour = switch_behaviour+10;
 
 para = struct('seed', 196, 'total_time', 300, 'w_s_all_actual', w_s_all_actual, 'w_s_all_recorded', w_s_all_recorded, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 1000);
 
 para_Trivial = struct('R_t', 2);
 
 [w_s_actual, w_s_recorded, I, Shape, Scale, Mean, Upper, Lower] = R_infer_disc_update_SI('Perfect', 'Trivial', para, para_Trivial);
-%%
+
 %%Plot
+
+figure(5)
+clf
 
 
 x1 = [0 0 30 30];
@@ -159,7 +162,7 @@ y4 = [0 2.5 2.5 0];
 
 x5 = [175 175 300 300];
 y5 = [0 2.5 2.5 0];
-
+%%
 
 x7 = [30 30 40 40];
 y7 = [0 2.5 2.5 0];
@@ -170,44 +173,22 @@ y8 = [0 2.5 2.5 0];
 x9 = [160 160 165 165];
 y9 = [0 2.5 2.5 0];
 
-
-
 x10 = [40 40 50 50];
 y10 = [0 2.5 2.5 0];
 
-x11 = [80 80 110 110];
+x11 = [0 0 80 110];
 y11 = [0 2.5 2.5 0];
 
-
-
-x6 = [170 170 175 175];
-y6 = [0 2.5 2.5 0];
-
-x12 = [50 50 60 60];
+x12 = [80 80 110 110];
 y12 = [0 2.5 2.5 0];
 
-x13 = [110 110 120 120];
+x13 = [0 0 80 110];
 y13 = [0 2.5 2.5 0];
-figure(5)
-clf
-% fill(x1,y1,'r')
-% hold on
-% fill(x2,y2,'r')
-% fill(x3,y3,'r')
-% fill(x4,y4,'r')
-% fill(x5,y5,'r')
-% fill(x6,y6,'y')
-% fill(x7,y7,'b')
-% fill(x8,y8,'b')
-% fill(x9,y9,'b')
-% fill(x10,y10,'g')
-% fill(x11,y11,'g')
-% fill(x12,y12,'y')
-% fill(x13,y13,'y')
 
-plot(Mean, 'k')
+plot(Mean)
+hold on
 
-
+fill(x,y,'r')
 
 title('Mean when there are updates on SIs')
 

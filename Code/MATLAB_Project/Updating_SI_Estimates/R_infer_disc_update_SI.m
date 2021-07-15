@@ -1,4 +1,4 @@
-function [w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_cont_update_SI(Serial_Estimate, I_Generation_Method, para, para_extra)
+function [w_s_actual, w_s_recorded, I, Shape, Scale, Mean, Upper, Lower] = R_infer_disc_update_SI(Serial_Estimate, I_Generation_Method, para, para_extra)
 
 %This function evaluates the output variables using Bayesian inference
 %techniques. The key difference is how the data is generated and how
@@ -7,8 +7,10 @@ function [w_s_t, I, Shape, Scale, Mean, Upper, Lower] = R_infer_cont_update_SI(S
 %Un-pack
 seed = para.seed;
 total_time = para.total_time;
-w_s_o = para.w_s_o; %Normal generated beforehand
-w_s_f = para.w_s_f; %Truncated normal generated beforehand
+w_s_all_actual = para.w_s_all_actual; %All serial intervals
+w_s_all_recorded = para.w_s_all_recorded;
+switch_behaviour = para.switch_behaviour;
+update_behaviour = para.update_behaviour;
 tau = para.tau;
 a = para.a;
 b = para.b;
@@ -16,24 +18,41 @@ I_0 = para.I_0;
 
 rng(seed) %Gives reproducible results
 
-w_s_t = zeros(total_time+1, length(w_s_o));
+w_s_actual = zeros(total_time+1, size(w_s_all_actual, 2));
+w_s_recorded = zeros(total_time+1, size(w_s_all_recorded, 2));
 
-w_s_t(1, :) = w_s_o;
+disp(size(w_s_recorded(update_behaviour(end)+1:end)))
+disp(size(repmat(w_s_all_recorded(end, :), 1, total_time+2-update_behaviour(end))))
 
+w_s_recorded(1:update_behaviour(1)-1, :) = repmat(w_s_all_recorded(1, :), update_behaviour(1)-1, 1);
+w_s_recorded(update_behaviour(end):end, :) = repmat(w_s_all_recorded(end, :), total_time+2-update_behaviour(end), 1);
+
+w_s_actual(1:switch_behaviour(1)-1, :) = repmat(w_s_all_actual(1, :), switch_behaviour(1)-1, 1);
+w_s_actual(switch_behaviour(end):end, :) = repmat(w_s_all_actual(end, :), total_time+2-switch_behaviour(end), 1);
+
+for i = 2:length(switch_behaviour)
+
+    w_s_actual(switch_behaviour(i-1):switch_behaviour(i)-1, :) = repmat(w_s_all_actual(i, :),switch_behaviour(i) - switch_behaviour(i-1) , 1);
+    
+end
+
+w_s_actual(:, 1) = [];
+
+for i = 2:length(update_behaviour)
+
+    w_s_recorded(update_behaviour(i-1):update_behaviour(i)-1, :) = repmat(w_s_all_recorded(i, :), update_behaviour(i) - update_behaviour(i-1), 1);
+    
+end
 
 if isequal(I_Generation_Method, 'Trivial')
 
     R_t = para_extra.R_t;
-
-%     w_s_o(1) = [];
     
     I = I_0;
     
     for t = 1:total_time
         
-        w_s_t(t+1, :) = (t*w_s_f +(total_time-t)*[w_s_o])/total_time;
-        
-        I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s_t(t, :)));
+        I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s_actual(t, :)));
         
         I = [I, I_new];
         
@@ -49,9 +68,7 @@ elseif isequal(I_Generation_Method, 'Variable')
     
     for t = 1:total_time
         
-        w_s_t(t+1, :) = (t*w_s_f +(total_time-t)*w_s_o)/total_time;
-        
-        I_new = poissrnd(R_t(t)*Incidence_Generator_2(I, w_s_t(t, :)));
+        I_new = poissrnd(R_t(t)*Incidence_Generator_2(I, w_s_actual(t, :)));
         
         I = [I, I_new];
         
@@ -63,7 +80,7 @@ end
 
 %%
 
-if isequal(Serial_Estimate, 'Perfect')
+if isequal(Serial_Estimate, 'Perfect') %Remember that Perfect isnt really perfect here
  
     Shape = zeros(1, total_time+1);
     Scale = zeros(1, total_time+1);
@@ -82,7 +99,7 @@ if isequal(Serial_Estimate, 'Perfect')
             
             I_relevant = I(1:k);
             
-            Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, w_s_t(k, :));
+            Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, [w_s_recorded(t, :)]);
             
         end
         
@@ -118,7 +135,7 @@ elseif isequal(Serial_Estimate, 'Fixed')
             
             I_relevant = I(1:k);
             
-            Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, w_s_o);
+            Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, [0 w_s_recorded(1, :)]);
             
         end
         
