@@ -128,19 +128,38 @@ plot(y, 2.0 + sin(2*pi*y/365))
 
 %% Discrete changes- 1 quarantining
 
+%The corresponding figure demonstrates that we can have quite strange
+%behaviour for R_t inference when the serial intervals are not alligned
+%with actual and recorded. We may even be surprised to see that these poor
+%estimates are still present for a short period of time even with exact
+%alignment between actual and recorded SIs (set delay=0). This happens
+%because to switch between SIs instantly foes not take into account the
+%fact that there will still be some infection flowing in from *previous*
+%behaviours *after* an intervention.
+
 w_s_all_actual = [w_s_o; w_s_f; w_s_o; w_s_f; w_s_o; w_s_f; w_s_o];
 
 w_s_all_recorded = [w_s_o; w_s_f; w_s_o; w_s_f; w_s_o; w_s_f; w_s_o];
 
 switch_behaviour = [30 50 70 110 160 165];
 
-update_behaviour = switch_behaviour+100;
+delay = 0;
+
+update_behaviour = switch_behaviour+ delay;
 
 para = struct('seed', 196, 'total_time', 300, 'w_s_all_actual', w_s_all_actual, 'w_s_all_recorded', w_s_all_recorded, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 1000);
 
 para_Trivial = struct('R_t', 2);
 
-[w_s_actual, w_s_recorded, I, Shape, Scale, Mean, Upper, Lower] = R_infer_disc_update_SI('Perfect', 'Trivial', para, para_Trivial);
+[w_s_actual, w_s_recorded, I, Shape, Scale, Mean, Upper, Lower] = R_infer_disc_update_SI('Perfect', 'Trivial','Non-Hybrid', para, para_Trivial);
+
+%We want to compare results with the hybrid SI method. To start with, we
+%will just use one switch time.
+
+switch_behaviour_hy = 50;
+update_behaviuour_hy = 50;
+
+
 %%
 %%Plot
 
@@ -218,4 +237,62 @@ clf
 plot(I)
 title('Incidence')
 
+%% Plot with Hybrids!
 
+%We must try a much simpler approach (to start off with)
+
+w_s_all_actual = [w_s_o; w_s_f];
+
+w_s_all_recorded = [w_s_o; w_s_f];
+
+switch_behaviour = 50;
+
+delay = 0;
+
+update_behaviour = switch_behaviour+ delay;
+
+para = struct('seed', 196, 'total_time', 300, 'w_s_all_actual', w_s_all_actual, 'w_s_all_recorded', w_s_all_recorded, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 1000);
+
+para_Trivial = struct('R_t', 2);
+
+[w_s_actual_Hybrid, w_s_recorded_Hybrid, ~, ~, ~, Mean_Hybrid, ~, ~] = R_infer_disc_update_SI('Perfect', 'Trivial','Hybrid', para, para_Trivial);
+
+[w_s_actual_Non_Hybrid, w_s_recorded_Non_Hybrid, ~, ~, ~, Mean_Non_Hybrid, ~, ~] = R_infer_disc_update_SI('Perfect', 'Trivial','Non-Hybrid', para, para_Trivial);
+
+
+figure(7)
+
+h(1) = plot(Mean_Non_Hybrid, 'k');
+hold on
+h(2) = plot(Mean_Hybrid, 'r');
+
+legend(h([1 2]), {'No Hybrid SIs', 'Hybrid SIs'}, 'Location', 'best')
+
+ylabel('$R_t$ inference')
+xlabel('Time, $t$ (Days)')
+
+%%
+
+w_s_all_actual(2, :) = w_s_all_actual(1, :);
+
+w_s_all_recorded(2, :) = w_s_all_recorded(1, :);
+
+switch_behaviour = 50;
+
+delay = 0;
+
+update_behaviour = switch_behaviour+ delay;
+
+para = struct('seed', 196, 'total_time', 300, 'w_s_all_actual', w_s_all_actual, 'w_s_all_recorded', w_s_all_recorded, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 1000);
+
+para_Trivial = struct('R_t', 2);
+
+[w_s_actual_Hybrid, w_s_recorded_Hybrid, ~, ~, ~, Mean_Hybrid, ~, ~] = R_infer_disc_update_SI('Perfect', 'Trivial','Hybrid', para, para_Trivial);
+
+[w_s_actual_Non_Hybrid, w_s_recorded_Non_Hyrbid, ~, ~, ~, Mean_Non_Hybrid, ~, ~] = R_infer_disc_update_SI('Perfect', 'Trivial','Non-Hybrid', para, para_Trivial);
+
+clf
+figure(8)
+plot(Mean_Hybrid, 'k')
+hold on
+plot(Mean_Non_Hybrid, 'r--')

@@ -6,6 +6,9 @@ function Gamma = Incidence_Generator_2(I_data, Serial) %
     
     length_S = length(Serial);
 
+    %Get the serial and the incidence to be the same length so we can dot
+    %product
+    
     if length_I < length_S
        
         I_recent = [zeros(1,length_S - length_I), I_data];
