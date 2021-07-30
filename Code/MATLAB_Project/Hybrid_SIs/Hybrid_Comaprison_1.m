@@ -46,7 +46,7 @@ w_s_all_actual = [w_s_o; w_s_a];
 
 w_s_all_recorded = [w_s_o; w_s_a];
 
-switch_behaviour = 160;
+switch_behaviour = 80;
 
 delay = 0;
 
@@ -56,7 +56,7 @@ para = struct('seed', 209, 'total_time', 300, 'w_s_all_actual', w_s_all_actual, 
 
 para_Trivial = struct('R_t', 2);
 
-% [w_s_actual_Hybrid, w_s_recorded_Hybrid, ~, ~, ~, Mean_Hybrid, ~, ~] = R_infer_disc_update_SI('Perfect', 'Trivial','Hybrid', para, para_Trivial);
+[w_s_actual_Hybrid, w_s_recorded_Hybrid, ~, ~, ~, Mean_Hybrid, ~, ~] = R_infer_disc_update_SI('Perfect', 'Trivial','Hybrid', para, para_Trivial);
 
 [w_s_actual_Non_Hybrid, w_s_recorded_Non_Hybrid, I, Shape_Non_Hybrid, Scale_Non_Hybrid, Mean_Non_Hybrid, ~, ~] = R_infer_disc_update_SI('Perfect', 'Trivial','Non-Hybrid', para, para_Trivial);
 
@@ -67,23 +67,23 @@ writematrix(I','Varying_Serial_Data.csv')
 %the data generated using hybrid SIs. Hybrid Generation is for this case
 %but we note we only use it for one switch time.
 
-% [w_s_actual_Hybrid_Generation_only, w_s_recorded_Hybrid_Generation_only, ~, ~, ~, Mean_Hybrid_Generation_only, ~, ~] = R_infer_disc_update_SI('Perfect', 'Trivial','Hybrid-Generation', para, para_Trivial);
+[w_s_actual_Hybrid_Generation_only, w_s_recorded_Hybrid_Generation_only, ~, ~, ~, Mean_Hybrid_Generation_only, ~, ~] = R_infer_disc_update_SI('Perfect', 'Trivial','Hybrid-Generation', para, para_Trivial);
 
 figure(1)
 clf
 
 h(1) = plot(Mean_Non_Hybrid, 'k');
-% hold on
-% h(2) = plot(Mean_Hybrid, 'r');
-% 
-% h(3) = plot(Mean_Hybrid_Generation_only, 'b--');
+hold on
+h(2) = plot(Mean_Hybrid, 'r');
+
+h(3) = plot(Mean_Hybrid_Generation_only, 'b--');
 
 % legend(h([1 2 3]), {'No Hybrid SIs', 'Hybrid SIs', 'Hybrid Generation'}, 'Location', 'NorthWest')
 
 ylabel('$R_t$ inference')
 xlabel('Time, $t$ (Days)')
 
-axis([60 200 1.85 2.05])
+axis([75 95 1.85 2.05])
 I(2)
 %%
 

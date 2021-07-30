@@ -1,0 +1,5 @@
+clc
+clear all
+close all
+
+Key = {'total_time', 'tau'}

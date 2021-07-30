@@ -1,4 +1,4 @@
-function [w_s_actual, w_s_recorded, I, Shape, Scale, Mean, Upper, Lower] = R_infer_disc_update_SI(Serial_Estimate, I_Generation_Method, Hybrid, para, para_extra)
+function [I, Mean] = R_infer_disc_update_Sensitivity(Serial_Estimate, I_Generation_Method, Hybrid, para_cell)
 
 %This function evaluates the output variables using Bayesian inference
 %techniques. The key difference is how the data is generated and how
@@ -8,55 +8,57 @@ function [w_s_actual, w_s_recorded, I, Shape, Scale, Mean, Upper, Lower] = R_inf
 %implement the change from time t+1.
 
 %Un-pack
-seed = para.seed;
-total_time = para.total_time;
-w_s_all_actual = para.w_s_all_actual; %All serial intervals
-w_s_all_recorded = para.w_s_all_recorded;
-switch_behaviour = para.switch_behaviour; %These are the times
-update_behaviour = para.update_behaviour; %These are the times
-tau = para.tau;
-a = para.a;
-b = para.b;
-I_0 = para.I_0;
+seed = para.seed; %1
+total_time = para.total_time; %2
+w_s_all_actual = para.w_s_all_actual; %3 %All serial intervals
+w_s_all_recorded = para.w_s_all_recorded; %4
+switch_behaviour = para.switch_behaviour; %5 %These are the times
+update_behaviour = para.update_behaviour; %6 %These are the times
+tau = para.tau; %7
+a = para.a; %8
+b = para.b; %9
+I_0 = para.I_0; %10
 
-rng(seed) %Gives reproducible results
+rng(para_cell{1}) %Gives reproducible results
 
 %Pre-allocate. We store as matrices because these are changing through
 %time.
 
-w_s_actual = zeros(total_time+1, size(w_s_all_actual, 2)); %Don't technically use serial interval for Day 0
-w_s_recorded = zeros(total_time+1, size(w_s_all_recorded, 2));
+w_s_actual = zeros(para_cell{2}+1, size(para_cell{3}, 2)); %Don't technically use serial interval for Day 0
+w_s_recorded = zeros(para_cell{2}+1, size(para_cell{4}, 2));
 
-w_s_recorded(1:update_behaviour(1)+1, :) = repmat(w_s_all_recorded(1, :), update_behaviour(1)+1, 1);
-w_s_recorded(update_behaviour(end)+1:end, :) = repmat(w_s_all_recorded(end, :), total_time+1-update_behaviour(end), 1);
 
-w_s_actual(1:switch_behaviour(1)+1, :) = repmat(w_s_all_actual(1, :), switch_behaviour(1)+1, 1);
-w_s_actual(switch_behaviour(end)+1:end, :) = repmat(w_s_all_actual(end, :), total_time+1-switch_behaviour(end), 1);
+w_s_recorded(1:para_cell{6}(1)+1, :) = repmat(para_cell{4}(1, :), para_cell{6}(1)+1, 1);
+w_s_recorded(para_cell{6}(end)+1:end, :) = repmat(para_cell{4}(end, :), para_cell{2}+1-para_cell{6}(end), 1);
+
+w_s_actual(1:para_cell{5}(1)+1, :) = repmat(para_cell{3}(1, :), para_cell{5}(1)+1, 1);
+w_s_actual(para_cell{5}(end)+1:end, :) = repmat(para_cell{3}(end, :), para_cell{2}+1-para_cell{5}(end), 1);
+
 
 %THIS WORKS
-% w_s_actual = [repmat(w_s_all_actual(1, :), switch_behaviour(1)+1, 1); repmat(w_s_all_actual(2, :), total_time-switch_behaviour(1), 1)];
-% w_s_recorded = [repmat(w_s_all_actual(1, :), switch_behaviour(1)+1, 1); repmat(w_s_all_actual(2, :), total_time-switch_behaviour(1), 1)];
+% w_s_actual = [repmat(para_cell{3}(1, :), para_cell{5}(1)+1, 1); repmat(para_cell{3}(2, :), para_cell{2}-para_cell{5}(1), 1)];
+% w_s_recorded = [repmat(para_cell{3}(1, :), para_cell{5}(1)+1, 1); repmat(para_cell{3}(2, :), para_cell{2}-para_cell{5}(1), 1)];
 
 %If we are using hybrid SIs, then both actual and recorded SIs should be
 %altered
 
 if isequal(Hybrid, 'Hybrid') || isequal(Hybrid, 'Hybrid-Generation')
     
-    if length(switch_behaviour)+length(update_behaviour) ~= 2
+    if length(para_cell{5})+length(para_cell{6}) ~= 2
         
         disp('Error! Wrong no. of switches/updates for this model version!')
         
         %Could also check that switch times are OK (i.e. equal)
     
-    elseif switch_behaviour ~= update_behaviour
+    elseif para_cell{5} ~= para_cell{6}
         
         disp('Error! Switch times should equal update times for this model version!')
     
     else
         
-        N_o = find(w_s_all_actual(1, :), 1, 'last')-1; %Finds last non zero element but takes off 1 because the days start from 0
+        N_o = find(para_cell{3}(1, :), 1, 'last')-1; %Finds last non zero element but takes off 1 because the days start from 0
         
-        N_a = find(w_s_all_actual(2, :), 1, 'last')-1;
+        N_a = find(para_cell{3}(2, :), 1, 'last')-1;
         
         num_hybrids = max(N_a, N_o - N_a);
         
@@ -72,15 +74,15 @@ if isequal(Hybrid, 'Hybrid') || isequal(Hybrid, 'Hybrid-Generation')
             
             %     if N_o-i >= N_a+1 %The backtracking hasn't reached the new threshold
             
-            tmp(1:length_hy) = w_s_all_actual(1, 1:length_hy);
+            tmp(1:length_hy) = para_cell{3}(1, 1:length_hy);
             
             if i <= N_a+1
                 
-                tmp(1:i) = w_s_all_actual(1, 1:i);
+                tmp(1:i) = para_cell{3}(1, 1:i);
                 
             elseif i > N_a+1
                 
-                tmp(1:N_a+1) = w_s_all_actual(2, 1:N_a+1);
+                tmp(1:N_a+1) = para_cell{3}(2, 1:N_a+1);
                 
             end
             
@@ -92,11 +94,11 @@ if isequal(Hybrid, 'Hybrid') || isequal(Hybrid, 'Hybrid-Generation')
         
         if isequal(Hybrid, 'Hybrid')
         
-            w_s_recorded(update_behaviour+1:update_behaviour+num_hybrids, :) = w_s_hy;
+            w_s_recorded(para_cell{6}+1:para_cell{6}+num_hybrids, :) = w_s_hy;
         
         end
         
-        w_s_actual(switch_behaviour+1:switch_behaviour+num_hybrids, :) = w_s_hy;
+        w_s_actual(para_cell{5}+1:para_cell{5}+num_hybrids, :) = w_s_hy;
         
     end
         
@@ -105,18 +107,18 @@ if isequal(Hybrid, 'Hybrid') || isequal(Hybrid, 'Hybrid-Generation')
     
 end
     
-% if isequal(Hybrid, 'Non-Hybrid') && length(switch_behaviour)>=2 && length(update_behaviour)>=2 
+% if isequal(Hybrid, 'Non-Hybrid') && length(para_cell{5})>=2 && length(para_cell{6})>=2 
 %     
-%     for i = 2:length(switch_behaviour)
+%     for i = 2:length(para_cell{5})
 %         
-%         w_s_actual(switch_behaviour(i-1)+1:switch_behaviour(i), :) = repmat(w_s_all_actual(i, :),switch_behaviour(i) - switch_behaviour(i-1) , 1);
+%         w_s_actual(para_cell{5}(i-1)+1:para_cell{5}(i), :) = repmat(para_cell{3}(i, :),para_cell{5}(i) - para_cell{5}(i-1) , 1);
 %         
 %     end
 %     
 %     
-%     for i = 2:length(update_behaviour)
+%     for i = 2:length(para_cell{6})
 %         
-%         w_s_recorded(update_behaviour(i-1)+1:update_behaviour(i), :) = repmat(w_s_all_recorded(i, :), update_behaviour(i) - update_behaviour(i-1), 1);
+%         w_s_recorded(para_cell{6}(i-1)+1:para_cell{6}(i), :) = repmat(para_cell{4}(i, :), para_cell{6}(i) - para_cell{6}(i-1), 1);
 %         
 %     end
 %     
@@ -132,9 +134,9 @@ if isequal(I_Generation_Method, 'Trivial')
 
     R_t = para_extra.R_t;
     
-    I = I_0;
+    I = para_cell{10};
     
-    for t = 1:total_time
+    for t = 1:para_cell{2}
         
         I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s_actual(t+1, :)));
         
@@ -144,13 +146,13 @@ if isequal(I_Generation_Method, 'Trivial')
         
 elseif isequal(I_Generation_Method, 'Variable')
     
-    R_t = para_extra.R_t([1:1:total_time+1]);
+    R_t = para_extra.R_t([1:1:para_cell{2}+1]);
 
 %     w_s_o(1) = [];
     
-    I = I_0;
+    I = para_cell{10};
     
-    for t = 1:total_time
+    for t = 1:para_cell{2}
         
         I_new = poissrnd(R_t(t)*Incidence_Generator_2(I, w_s_actual(t+1, :)));
         
@@ -167,19 +169,19 @@ end
 
 if isequal(Serial_Estimate, 'Perfect') %Remember that Perfect isnt really perfect here
  
-    Shape = zeros(1, total_time);
-    Scale = zeros(1, total_time);
-    Mean = zeros(1, total_time);
-    Upper = zeros(1, total_time);
-    Lower = zeros(1, total_time);
+    Shape = zeros(1, para_cell{2});
+    Scale = zeros(1, para_cell{2});
+    Mean = zeros(1, para_cell{2});
+    Upper = zeros(1, para_cell{2});
+    Lower = zeros(1, para_cell{2});
     
-    for t = tau+1:total_time % We start from tau+1 because the EpiEstim app does too (starting from using the second data point since we cant infer alot from the first)
+    for t = para_cell{7}+1:para_cell{2} % We start from para_cell{7}+1 because the EpiEstim app does too (starting from using the second data point since we cant infer alot from the first)
         
-        Shape(t) = a + sum(I(t-tau+1:t));
+        Shape(t) = para_cell{8} + sum(I(t-para_cell{7}+1:t));
         
         %Calculate summation of Lambdas
         
-        for k = t:-1:t-tau+1 % k  = t-tau+1:t
+        for k = t:-1:t-para_cell{7}+1 % k  = t-para_cell{7}+1:t
             
             I_relevant = I(1:k);
             
@@ -187,9 +189,9 @@ if isequal(Serial_Estimate, 'Perfect') %Remember that Perfect isnt really perfec
             
         end
         
-        I(1) = I_0; %First case is imported
+        I(1) = para_cell{10}; %First case is imported
         
-        Scale(t) = 1/(Scale(t)+(1/b));
+        Scale(t) = 1/(Scale(t)+(1/para_cell{9}));
         
         Mean(t) = Scale(t)*Shape(t);
         
@@ -201,21 +203,21 @@ if isequal(Serial_Estimate, 'Perfect') %Remember that Perfect isnt really perfec
        
 elseif isequal(Serial_Estimate, 'Fixed')
     
-    Shape = zeros(1, total_time);
-    Scale = zeros(1, total_time);
-    Mean = zeros(1, total_time);
-    Upper = zeros(1, total_time);
-    Lower = zeros(1, total_time);
+    Shape = zeros(1, para_cell{2});
+    Scale = zeros(1, para_cell{2});
+    Mean = zeros(1, para_cell{2});
+    Upper = zeros(1, para_cell{2});
+    Lower = zeros(1, para_cell{2});
     
     
-    for t = tau+1:total_time+1
+    for t = para_cell{7}+1:para_cell{2}+1
         
-        Shape(t) = a + sum(I(t-tau+1:t));
+        Shape(t) = para_cell{8} + sum(I(t-para_cell{7}+1:t));
         Scale(t) = 0;
         
         %Calculate summation of Lambdas
         
-        for k  = t-tau+1:t
+        for k  = t-para_cell{7}+1:t
             
             I_relevant = I(1:k);
             
@@ -223,9 +225,9 @@ elseif isequal(Serial_Estimate, 'Fixed')
             
         end
         
-        I(1) = I_0; %First case is imported
+        I(1) = para_cell{10}; %First case is imported
         
-        Scale(t) = 1/(Scale(t)+(1/b));
+        Scale(t) = 1/(Scale(t)+(1/para_cell{9}));
         
         Mean(t) = Scale(t)*Shape(t);
         
