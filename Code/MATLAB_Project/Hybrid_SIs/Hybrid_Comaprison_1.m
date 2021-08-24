@@ -78,13 +78,20 @@ h(2) = plot(Mean_Hybrid, 'r');
 
 h(3) = plot(Mean_Hybrid_Generation_only, 'b--');
 
-% legend(h([1 2 3]), {'No Hybrid SIs', 'Hybrid SIs', 'Hybrid Generation'}, 'Location', 'NorthWest')
+legend(h([1 2 3]), {'No Hybrid SIs', 'Hybrid SIs', 'Hybrid Generation'}, 'Location', 'best')
 
 ylabel('$R_t$ inference')
 xlabel('Time, $t$ (Days)')
 
 axis([75 95 1.85 2.05])
 I(2)
+
+figure(2)
+
+plot(w_s_a)
+hold on
+
+plot(w_s_o)
 %%
 
 para_Variable = struct('R_t', @(x) 2.0 - 0.5*(x>50));

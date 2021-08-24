@@ -11,7 +11,7 @@ function [Mean_Dif, Area_Dif, para_all] = Sensitivity_Analysis(key_para_string, 
 
 %Plan
 
-%Find which one is the key parameter
+%Find which one is the key parameter (we cannot have idx=4 as a kaye parameter. we just have idx =3 as one)
 
 %On each for loop change this value
 %Massive if loop for if key_string = 'total_time' else if key_string =
@@ -36,7 +36,9 @@ FieldNames = [FieldNames_1; FieldNames_2];
 idx1 = find(contains(FieldNames,key_para_string(1)));
 idx2 = find(contains(FieldNames,key_para_string(2)));
 
-length_1 = size(para_cell{idx1}, 2); %2 because this will work generally, including for the serial intervals
+size_1 = size(para_cell{idx1}); % Used to be 2 because this will work generally, including for the serial intervals
+
+length_1 = size_1(end); %Works for 3d matrix too
 
 if idx2 > length(FieldNames_1)
 
@@ -63,7 +65,17 @@ end
 %Find way to get variable of string
 % NEED TO UPDATE R_T FOR DIFFERENT LENGTHS OF TIME
 
+%Create cells of all paremters for updated and non-updated serials
+
 para_tmp = para_all;
+
+para_tmp_NU = para_all;
+
+if idx1 ~= 3
+
+para_tmp_NU{4}(2, :) = para_all{4}(1, :); %Recorded for updated equals the actual 
+
+end
 
 Mean_Dif = zeros(length_1, length_2);
 
@@ -71,29 +83,72 @@ Area_Dif = zeros(length_1, length_2);
 
 rng(para_tmp{1})
 
+idx1
+
 for index_1 = 1:length_1
     
-    para_tmp{idx1} = para_all{idx1}(index_1);
     
+    if idx1 == 3 || idx1 == 4 %In this case a 3d matrix
+        
+        para_tmp{idx1} = para_all{idx1}(:, :, index_1); %Since it will be a 3d matrix
+
+        para_tmp_NU{idx1} = para_all{idx1}(:, :, index_1);
+    
+    else
+    
+        para_tmp{idx1} = para_all{idx1}(index_1);
+
+        para_tmp_NU{idx1} = para_all{idx1}(index_1);
+        
+    end
+
+    
+    if idx1 == 3 %In the case when idx1==3, we need to make sure that the recorded is updated for tmp but not for tmp_NU!
+        
+        para_tmp{4} = para_all{3}(:, :, index_1);
+        
+        para_tmp_NU{4} = para_all{3}(:, :, index_1);
+        
+        para_tmp_NU{4}(2, :) = para_all{3}(1, :, index_1); %No update!
+        
+    end
+
     %Update key parameter_1
     
     for index_2 = 1:length_2
+        
        
-        para_tmp{idx2} = para_all{idx2}(index_2);
+        if idx2 == 3 || idx2 == 4 %In this case para_all{idx} is a vector
+            
+            para_tmp{idx2} = para_all{idx2}(:, :, index_2);
+            
+            para_tmp_NU{idx2} = para_all{idx2}(:, :, index_2);
+            
+        else
+        
+            para_tmp{idx2} = para_all{idx2}(index_2);
+            
+            para_tmp_NU{idx2} = para_all{idx2}(index_2);
+            
+        end
+        
+%         if idx2 == 3
+%             
+%            para_tmp{4} = para_tmp{3}(:, :, index_2);
+%             
+%         end
         
         [~, tmp_Mean_Update] = R_infer_disc_update_Sensitivity(Serial_Estimate, I_Generation_Method, Hybrid, para_tmp);
         
-        para_tmp{4} = para_tmp{3};
+        [~, tmp_Mean_Non_Update] = R_infer_disc_update_Sensitivity(Serial_Estimate, I_Generation_Method, Hybrid, para_tmp_NU);
         
-        [~, tmp_Mean_Non_Update] = R_infer_disc_update_Sensitivity(Serial_Estimate, I_Generation_Method, Hybrid, para_tmp);
-        
-        mean_NU = tmp_Mean_Non_Update(para_tmp{5}+1:end);
+        mean_NU = tmp_Mean_Non_Update(para_tmp_NU{5}+1:end);
         
         mean_U = tmp_Mean_Update(para_tmp{5}+1:end);
         
-        Mean_Dif(index_1, index_2) = mean_NU(end)-mean_U(end);
+        Mean_Dif(index_1, index_2) = abs((mean_NU(end)-mean_U(end)))/mean_U(end);
         
-        Area_Dif(index_1, index_2) = trapz(para_tmp{5}+1:para_tmp{2}, abs(mean_NU-mean_U));
+        Area_Dif(index_1, index_2) = trapz(para_tmp{5}+1:para_tmp{2}, abs(mean_NU-mean_U))/(trapz(para_tmp{5}+1:para_tmp{2}, mean_U));
         
     end
     
@@ -115,144 +170,4 @@ end
 %     
 %     String_1 = Field
 %     
-% end
-
-
-
-
-%% Comment from here
-
-% %Pre-allocate. We store as matrices because these are changing through
-% %time.
-% 
-% w_s_actual = zeros(total_time+1, size(w_s_all_actual, 2)); %Don't technically use serial interval for Day 0
-% w_s_recorded = zeros(total_time+1, size(w_s_all_recorded, 2));
-% 
-% 
-% w_s_recorded(1:update_behaviour(1)+1, :) = repmat(w_s_all_recorded(1, :), update_behaviour(1)+1, 1);
-% w_s_recorded(update_behaviour(end)+1:end, :) = repmat(w_s_all_recorded(end, :), total_time+1-update_behaviour(end), 1);
-% 
-% w_s_actual(1:switch_behaviour(1)+1, :) = repmat(w_s_all_actual(1, :), switch_behaviour(1)+1, 1);
-% w_s_actual(switch_behaviour(end)+1:end, :) = repmat(w_s_all_actual(end, :), total_time+1-switch_behaviour(end), 1);
-% 
-% 
-% %THIS WORKS
-% % w_s_actual = [repmat(w_s_all_actual(1, :), switch_behaviour(1)+1, 1); repmat(w_s_all_actual(2, :), total_time-switch_behaviour(1), 1)];
-% % w_s_recorded = [repmat(w_s_all_actual(1, :), switch_behaviour(1)+1, 1); repmat(w_s_all_actual(2, :), total_time-switch_behaviour(1), 1)];
-% 
-% %If we are using hybrid SIs, then both actual and recorded SIs should be
-% %altered
-% 
-% 
-% if isequal(I_Generation_Method, 'Trivial')
-% 
-%     R_t = para_extra.R_t;
-%     
-%     I = I_0;
-%     
-%     for t = 1:total_time
-%         
-%         I_new = poissrnd(R_t*Incidence_Generator_2(I, w_s_actual(t+1, :)));
-%         
-%         I = [I, I_new];
-%         
-%     end
-%         
-% elseif isequal(I_Generation_Method, 'Variable')
-%     
-%     R_t = para_extra.R_t([1:1:total_time+1]);
-% 
-% %     w_s_o(1) = [];
-%     
-%     I = I_0;
-%     
-%     for t = 1:total_time
-%         
-%         I_new = poissrnd(R_t(t)*Incidence_Generator_2(I, w_s_actual(t+1, :)));
-%         
-%         I = [I, I_new];
-%         
-%     end
-%     
-% elseif isequal(I_Generation_Method, 'Data')
-%     
-%     I = para_extra.Incidence;
-%     
-% end
-% 
-% 
-% if isequal(Serial_Estimate, 'Perfect') %Remember that Perfect isnt really perfect here
-%  
-%     Shape = zeros(1, total_time);
-%     Scale = zeros(1, total_time);
-%     Mean = zeros(1, total_time);
-%     Upper = zeros(1, total_time);
-%     Lower = zeros(1, total_time);
-%     
-%     for t = tau+1:total_time % We start from tau+1 because the EpiEstim app does too (starting from using the second data point since we cant infer alot from the first)
-%         
-%         Shape(t) = a + sum(I(t-tau+1:t));
-%         
-%         %Calculate summation of Lambdas
-%         
-%         for k = t:-1:t-tau+1 % k  = t-tau+1:t
-%             
-%             I_relevant = I(1:k);
-%             
-%             Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, [0 w_s_recorded(k , :)]);
-%             
-%         end
-%         
-%         I(1) = I_0; %First case is imported
-%         
-%         Scale(t) = 1/(Scale(t)+(1/b));
-%         
-%         Mean(t) = Scale(t)*Shape(t);
-%         
-%         Upper(t) = gaminv(0.975, Shape(t), Scale(t));
-%         
-%         Lower(t) = gaminv(0.025, Shape(t), Scale(t));
-%         
-%     end
-%        
-% elseif isequal(Serial_Estimate, 'Fixed')
-%     
-%     Shape = zeros(1, total_time);
-%     Scale = zeros(1, total_time);
-%     Mean = zeros(1, total_time);
-%     Upper = zeros(1, total_time);
-%     Lower = zeros(1, total_time);
-%     
-%     
-%     for t = tau+1:total_time+1
-%         
-%         Shape(t) = a + sum(I(t-tau+1:t));
-%         Scale(t) = 0;
-%         
-%         %Calculate summation of Lambdas
-%         
-%         for k  = t-tau+1:t
-%             
-%             I_relevant = I(1:k);
-%             
-%             Scale(t) = Scale(t) + Incidence_Generator_2(I_relevant, [0 w_s_recorded(1, :)]); %WHY IS THIS ONE DIFFERENT TO SCALE ON PERFECT?
-%             
-%         end
-%         
-%         I(1) = I_0; %First case is imported
-%         
-%         Scale(t) = 1/(Scale(t)+(1/b));
-%         
-%         Mean(t) = Scale(t)*Shape(t);
-%         
-%         Upper(t) = gaminv(0.975, Shape(t), Scale(t));
-%         
-%         Lower(t) = gaminv(0.025, Shape(t), Scale(t));
-%         
-%     end
-% 
-% elseif isequal(Serial_Estimate, 'Gradual')
-% 
-% end
-% 
 % end

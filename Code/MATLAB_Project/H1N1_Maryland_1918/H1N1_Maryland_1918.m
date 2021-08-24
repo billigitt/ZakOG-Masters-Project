@@ -118,7 +118,7 @@ xlabel('Time, $t$ (days)')
 
 legend(h([1 2]), '$\bar{R}_t$', '95\% Posterior CI', 'Location', 'Best')
 
-Printer = 1;
+Printer = 0;
 
 if Printer == 1
 %Save figure
@@ -134,13 +134,31 @@ clf
 
 daysflip = [tau:total_time, total_time:-1:tau];
 inBetween = [Lower(tau+1:total_time+1), fliplr(Upper(tau+1:total_time+1))];
+
+yyaxis left
+
 h(1) = fill(daysflip, inBetween, [.75 .75 .75], 'LineWidth', 0.1,'edgecolor', [1 1 1]);
 
 hold on
 
-h(2) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
+h(2) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k', 'LineStyle', '-');
 
 h(3) = plot([tau total_time], [1 1], 'k--', 'LineWidth', 1);
+
+title({'Real-time $R_t$ inference of 1918 H1N1';['outbreak in Maryland, USA ($\tau =$ ', num2str(tau), ' days$)$']})
+ylabel('$\tilde{R}_t$')
+xlabel('Time, $t$ (days)')
+
+yyaxis right
+
+h(4) = bar(days, I, 'FaceColor', C(1, :), 'LineStyle', 'none', 'FaceAlpha', 0.3);
+
+ylabel('Incidence')
+
+ax = gca;
+ax.YAxis(1).Color = 'k';
+
+ax.YAxis(2).Color = C(1, :);
 
 %Labels
 
@@ -148,21 +166,19 @@ h(3) = plot([tau total_time], [1 1], 'k--', 'LineWidth', 1);
 % h(4) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'color', C(2, :), 'LineStyle', '--');
 % % plot([days(1) days(end)], [a*b a*b], 'b--')
 
-title({'Real-time $R_t$ inference of 1918 H1N1';['outbreak in Maryland, USA ($\tau =$ ', num2str(tau), ' days$)$']})
-ylabel('$\bar{R}_t$')
-xlabel('Time, $t$ (days)')
+
 
 %Legend
 
-legend(h([1 2]), '$\bar{R}_t$', '95\% Posterior CI', 'Location', 'Best')
-axis([0 total_time+tau 0 max(Upper)])
+legend(h([1 2 4]), '$\tilde{R}_t$', '95\% Posterior CI', 'Incidence Data', 'Location', 'Best')
+% axis([0 total_time+tau 0 max(Upper)])
 
-if Printer == 1
+if Printer == 0
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
 saveas(gcf, 'H1N1_Maryland_1918_Estimate_CI_Zoom.eps')
 
-export_fig H1N1_Maryland_1918_Estimate_CI_Zoom.eps -eps -r300 -painters -transparent
+export_fig H1N1_Maryland_1918_Estimate_CI_Zoom.eps -eps -r300 -opengl
 
 end
 

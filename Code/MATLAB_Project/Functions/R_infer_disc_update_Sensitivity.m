@@ -27,7 +27,6 @@ rng(para_cell{1}) %Gives reproducible results
 w_s_actual = zeros(para_cell{2}+1, size(para_cell{3}, 2)); %Don't technically use serial interval for Day 0
 w_s_recorded = zeros(para_cell{2}+1, size(para_cell{4}, 2));
 
-
 w_s_recorded(1:para_cell{6}(1)+1, :) = repmat(para_cell{4}(1, :), para_cell{6}(1)+1, 1);
 w_s_recorded(para_cell{6}(end)+1:end, :) = repmat(para_cell{4}(end, :), para_cell{2}+1-para_cell{6}(end), 1);
 
@@ -132,7 +131,7 @@ end
 
 if isequal(I_Generation_Method, 'Trivial')
 
-    R_t = para_celll{end};
+    R_t = para_cell{end};
     
     I = para_cell{10};
     

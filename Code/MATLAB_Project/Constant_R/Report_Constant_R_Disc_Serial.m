@@ -13,7 +13,7 @@ C  = [0.3686 0.3098 0.6353; 0.2005 0.5593 0.7380; 0.4558 0.7897 0.6458;...
     0.8525 0.2654 0.3082; 0.6196 0.0039 0.2588];
 addpath('../Functions', '~/Documents/MATLAB/export_fig', '~/Documents/MATLAB/matlab2tikz')
 savepath ../Functions/pathdef.m
-Printer = 1;
+Printer = 2;
 %% Report_Constant_R_Disc_Serial
 
 %Here, we aim to create a large and comprehensive study looking at the
@@ -94,6 +94,8 @@ para_4_correct = struct('seed', 1, 'total_time', total_time, 'w_s_all_actual', w
 
 para_Trivial = struct('R_t', 2);
 
+[~, ~, ~, ~, ~, Mean_0_default, Upper_0_default, Lower_0_default] = R_infer_disc_update_SI('Perfect', 'Trivial','Non-Hybrid', para_1_incorrect, para_Trivial);
+
 [~, ~, ~, ~, ~, Mean_1_incorrect, Upper_1_incorrect, Lower_1_incorrect] = R_infer_disc_update_SI('Perfect', 'Trivial','Non-Hybrid', para_1_incorrect, para_Trivial);
 
 [~, ~, I_1, ~, ~, Mean_1_correct, Upper_1_correct, Lower_1_correct] = R_infer_disc_update_SI('Perfect', 'Trivial','Non-Hybrid', para_1_correct, para_Trivial);
@@ -112,6 +114,9 @@ para_Trivial = struct('R_t', 2);
 
 
 daysflip = [tau+1:total_time, total_time:-1:tau+1];
+
+inBetween_0_default = [Lower_0_default(tau+1:total_time), fliplr(Upper_0_default(tau+1:total_time))];
+
 inBetween_1_incorrect = [Lower_1_incorrect(tau+1:total_time), fliplr(Upper_1_incorrect(tau+1:total_time))];
 inBetween_1_correct = [Lower_1_correct(tau+1:total_time), fliplr(Upper_1_correct(tau+1:total_time))];
 
@@ -158,6 +163,30 @@ figure(2)
 clf
 h(1) = plot([0 total_time], [para_Trivial.R_t para_Trivial.R_t], 'color', [.5 .5 .5], 'LineWidth', 1.5);
 hold on
+h(2) = fill(daysflip, inBetween_0_default, 'k', 'LineStyle', 'none', 'FaceAlpha', 0.25);
+
+h(4) = plot(tau+1:total_time, Mean_0_default(tau+1:total_time), 'color', 'k');
+
+xlabel('Time, $t$ (days)')
+ylabel('$\tilde{R}_t$ ')
+
+legend(h([1 4 2]), '$R_t = 2$', 'Mean $\tilde{R}_t$', '95 \% CI')
+
+title('Standard $R_t$ Inference')
+
+if Printer == 1
+
+% Save figure
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
+export_fig Report_Constant_R_Disc_Serial_0_Default.eps -eps -opengl
+
+end
+
+%%
+figure(3)
+clf
+h(1) = plot([0 total_time], [para_Trivial.R_t para_Trivial.R_t], 'color', [.5 .5 .5], 'LineWidth', 1.5);
+hold on
 h(2) = fill(daysflip, inBetween_1_incorrect, C(4, :), 'LineStyle', 'none', 'FaceAlpha', 0.25);
 
 h(3) = fill(daysflip, inBetween_1_correct, C(1, :), 'LineStyle', 'none', 'FaceAlpha', 0.25);
@@ -186,7 +215,7 @@ export_fig Report_Constant_R_Disc_Serial_1.eps -eps -opengl
 
 end
 
-figure(3)
+figure(4)
 clf
 h(1) = plot([0 total_time], [para_Trivial.R_t para_Trivial.R_t], 'color', [.5 .5 .5], 'LineWidth', 1.5);
 hold on
@@ -215,7 +244,7 @@ export_fig Report_Constant_R_Disc_Serial_2.eps -eps -opengl
 
 end
 
-figure(4)
+figure(5)
 clf
 h(1) = plot([0 total_time], [para_Trivial.R_t para_Trivial.R_t], 'color', [.5 .5 .5], 'LineWidth', 1.5);
 hold on
@@ -247,7 +276,7 @@ export_fig Report_Constant_R_Disc_Serial_3.eps -eps -opengl
 
 end
 
-figure(5)
+figure(6)
 clf
 h(1) = plot([0 total_time], [para_Trivial.R_t para_Trivial.R_t], 'color', [.5 .5 .5], 'LineWidth', 1.5);
 hold on
@@ -278,3 +307,6 @@ export_fig Report_Constant_R_Disc_Serial_4.eps -eps -opengl
 % matlab2tikz('triagle.tex'); % black background
 
 end
+
+%%
+
