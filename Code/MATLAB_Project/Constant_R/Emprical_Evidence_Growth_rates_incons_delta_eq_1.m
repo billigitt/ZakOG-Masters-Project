@@ -45,7 +45,7 @@ b = phi(2:2:4*N+2);
 
 Delta_Mat = repmat(b, 1, N) + a.*(1:N);
 
-Delta_Mat = reshape(Delta_Mat', [1 N 2*N+1])
+Delta_Mat = reshape(Delta_Mat', [1 N 2*N+1]);
 
 Key = {'w_s_all_actual', 'R_t'};
 
@@ -86,7 +86,7 @@ para_Linear_Vary = struct('R_t', R_start + (R_end(1)-R_start(1))*days/total_time
 [Abs_Mean_Dif, Abs_Area_Dif, ~] = Sensitivity_Analysis(Key, para, para_Linear_Vary, 'Perfect', 'Trivial', 'Non-Hybrid');
 %% Plots
 R_t = para_Linear_Vary.R_t;
-figure(5)
+figure(1)
 clf
 
 subplot(1, 2, 1)
@@ -111,7 +111,7 @@ c = colorbar;
 set(c,'TickLabelInterpreter','latex')
 ylabel(c, '$\frac{\int^{T_e}_{T_i} |\tilde{R}_t^o(s) - \tilde{R}_t^a(s)| \mathrm{d}s}{\int^{T_e}_{T_i} \tilde{R}_t^a(s) \mathrm{d}s}$', 'Interpreter', 'latex', 'FontSize', 18)
 
-if Printer == 0
+if Printer == 1
 
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 40 10], 'PaperUnits', 'centimeters', 'PaperSize', [40 10]);
@@ -122,7 +122,7 @@ end
 
 
 
-figure(6)
+figure(2)
 clf
 subplot(1, 2, 1)
 imagesc(R_t, mu, Mean_Dif)
@@ -148,11 +148,55 @@ c = colorbar;
 set(c,'TickLabelInterpreter','latex')
 ylabel(c, '$\frac{ |\tilde{R}_t^o(T_e) - \tilde{R}_t^a(T_e)|}{\tilde{R}_t^a(T_e)}$', 'Interpreter', 'latex', 'FontSize', 18)
 
-if Printer == 0
+if Printer == 1
 
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 40 10], 'PaperUnits', 'centimeters', 'PaperSize', [40 10]);
 saveas(gcf, 'Mean_R_t_delta_eq_1.eps')
 export_fig Mean_R_t_delta_eq_1.eps -eps -r300 -painters -transparent
+
+end
+
+Days = 1:N;
+
+figure(3)
+clf
+h(1) = plot(Days, Delta_Mat(1, :, 1), 'color', C(4,:));
+
+hold on
+
+for i = 2:7
+   
+    plot(Days, Delta_Mat(1, :, i), 'color', C(4, :))
+    
+end
+
+for i = 8:14
+   
+    h(2) = plot(Days, Delta_Mat(1, :, i), 'color', C(1, :));
+    
+end
+
+for i = 15:21
+   
+    h(3) = plot(Days, Delta_Mat(1, :, i), 'color', C(3, :));
+    
+end
+
+legend(h([1 2 3]),  strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu(1)),'$,$', num2str(mu(7)), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu(8)),'$,$', num2str(mu(14)), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu(15)),'$,$', num2str(mu(21)), '$)$'), 'Location', 'best')
+
+xlabel('Interval, $t$ (days)')
+ylabel('$\mbox{\boldmath{$\Delta$}}(t)$')
+
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+title({'Distribution of';'linear \mbox{\boldmath$\Delta$} distributions for $\alpha=1$'})
+
+if Printer == 0
+
+%Save figure
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [20 15]);
+saveas(gcf, 'Linear_Delta.eps')
+export_fig Linear_Delta.eps -eps -r300 -painters -transparent
 
 end

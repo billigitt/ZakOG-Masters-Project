@@ -184,42 +184,42 @@ end
 
 %%
 
-figure(3)
-clf
-h(1) = bar(days, I, 'FaceColor', [.5 .5 .5]);
-% hold on
-% plot(days, R_t.^days, 'r')
-title('Incidence data for H1N1 outbreak in Maryland, USA')
-ylabel('Incidence')
-xlabel('Time, $t$ (days)')
-
-if Printer == 1
-%Save figure
-set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-saveas(gcf, 'H1N1_Maryland_1918_Estimate_Incidence.eps')
-
-export_fig H1N1_Maryland_1918_Estimate_Incidence.eps -eps -r300 -painters -transparent
-
-end
-
-ix = find(w_s~=0, 1, 'last');
-
-W_s = w_s(1:ix);
-
-figure(4)
-plot(0:length(W_s)-1, W_s, 'k')
-title('EpiEstim Serial Interval')
-ylabel('Probability')
-xlabel('Time, $t$ (days)')
-
-if Printer == 1
-%Save figure
-set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-saveas(gcf, 'H1N1_Maryland_1918_Estimate_Certain_Serial.eps')
-
-export_fig H1N1_Maryland_1918_Estimate_Certain_Serial.eps -eps -r300 -painters -transparent
-
-end
+% figure(3)
+% clf
+% h(1) = bar(days, I, 'FaceColor', [.5 .5 .5]);
+% % hold on
+% % plot(days, R_t.^days, 'r')
+% title('Incidence data for H1N1 outbreak in Maryland, USA')
+% ylabel('Incidence')
+% xlabel('Time, $t$ (days)')
+% 
+% if Printer == 1
+% %Save figure
+% set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
+% saveas(gcf, 'H1N1_Maryland_1918_Estimate_Incidence.eps')
+% 
+% export_fig H1N1_Maryland_1918_Estimate_Incidence.eps -eps -r300 -painters -transparent
+% 
+% end
+% 
+% ix = find(w_s~=0, 1, 'last');
+% 
+% W_s = w_s(1:ix);
+% 
+% figure(4)
+% plot(0:length(W_s)-1, W_s, 'k')
+% title('EpiEstim Serial Interval')
+% ylabel('Probability')
+% xlabel('Time, $t$ (days)')
+% 
+% if Printer == 1
+% %Save figure
+% set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
+% saveas(gcf, 'H1N1_Maryland_1918_Estimate_Certain_Serial.eps')
+% 
+% export_fig H1N1_Maryland_1918_Estimate_Certain_Serial.eps -eps -r300 -painters -transparent
+% 
+% end
 
 %% Comparison to EpiEstim
 
@@ -261,6 +261,7 @@ h(2) = plot(Scale(tau+1:end), 'k', 'LineStyle', '--');
 title('Scale parameter comparison')
 ylabel('$\theta$')
 xlabel('Time, $t$ (days)')
+
 
 if Printer == 1
 %Save figure

@@ -159,9 +159,19 @@ elseif isequal(I_Generation_Method, 'Variable')
         
     end
     
-elseif isequal(I_Generation_Method, 'Data')
+elseif isequal(I_Generation_Method, 'Trivial_and_Expectation')
     
-    I = para_extra.Incidence;
+    R_t = para_cell{end};
+    
+    I = para_cell{10};
+    
+    for t = 1:para_cell{2}
+        
+        I_new = R_t*Incidence_Generator_2(I, w_s_actual(t+1, :));
+        
+        I = [I, I_new];
+        
+    end
     
 end
 

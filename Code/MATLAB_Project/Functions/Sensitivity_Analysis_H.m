@@ -1,4 +1,4 @@
-function [Mean_Dif, Area_Dif, para_all] = Sensitivity_Analysis_NonAbs(key_para_string, para, para_extra, Serial_Estimate, I_Generation_Method, Hybrid)
+function [Ratio, para_all] = Sensitivity_Analysis_H(key_para_string, para, para_extra, Serial_Estimate, I_Generation_Method, Hybrid)
 
 %This function performs sensitivity analyses on two key parameters and
 %determines both the end time offset of the unupdated inference versus the
@@ -50,6 +50,8 @@ else
     
 end
 
+length_2
+
 % seed = para.seed;
 % total_time = para.total_time;
 % w_s_all_actual = para.w_s_all_actual; %All serial intervals
@@ -77,13 +79,10 @@ para_tmp_NU{4}(2, :) = para_all{4}(1, :); %Recorded for updated equals the actua
 
 end
 
-Mean_Dif = zeros(length_1, length_2);
+Ratio = zeros(length_1, length_2);
 
-Area_Dif = zeros(length_1, length_2);
 
 rng(para_tmp{1})
-
-idx1
 
 for index_1 = 1:length_1
     
@@ -146,9 +145,9 @@ for index_1 = 1:length_1
         
         mean_U = tmp_Mean_Update(para_tmp{5}+1:end);
         
-        Mean_Dif(index_1, index_2) = (mean_NU(end)-mean_U(end))/mean_U(end);
+        Ratio(index_1, index_2) = mean_NU(end)/mean_U(end); %This is h(r). We want to show thatthe limit as r goes to infinite is w_a(1)/w_o(1), note that it is reciprocated! 
         
-        Area_Dif(index_1, index_2) = trapz(para_tmp{5}+1:para_tmp{2}, (mean_NU-mean_U))/(trapz(para_tmp{5}+1:para_tmp{2}, mean_U));
+        
         
     end
     
