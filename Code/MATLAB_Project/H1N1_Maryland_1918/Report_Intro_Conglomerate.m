@@ -655,6 +655,7 @@ Printer = 1;
 % figure(5)
 % clf
 subplot(3, 2, 5)
+clf
 h(1) = plot(k,'color', C(2, :));
 hold on
 h(2) = plot(Shape(tau+1:end), 'k', 'LineStyle', '--');
@@ -675,14 +676,14 @@ legend(h([1 2]), 'EpiEstim inference', 'Our inference', 'Position', [0.6305 0.24
 hYLabel = get(gca,'YLabel');
 set(hYLabel,'rotation',0,'VerticalAlignment','middle')
 yticks([0 0.01 0.03 0.04])
-sgtitle('Typical $R_t$ and $r(t)$ behaviour, $\tilde{R}_t$ inference and Epi-Estim comparisons', 'Fontsize', 16)
+% title('Typical $R_t$ and $r(t)$ behaviour, $\tilde{R}_t$ inference and Epi-Estim comparisons', 'Position', [.5 .5 .5])
 
 if Printer == 1
 %Save figure
-set(gcf, 'Units', 'centimeters', 'Position', [60 20 40 20], 'PaperUnits', 'centimeters', 'PaperSize', [40 20]);
+set(gcf, 'Units', 'centimeters', 'Position', [60 10 40 20], 'PaperUnits', 'centimeters', 'PaperSize', [40 20]);
 saveas(gcf, 'Intro_Conglom.eps')
 
-export_fig Intro_Conglom.eps -eps -r300 -painters -transparent
+% export_fig Intro_Conglom.eps -eps -r300 -painters -transparent
 
 end
 % f.Position = [2000 100 1040 800];

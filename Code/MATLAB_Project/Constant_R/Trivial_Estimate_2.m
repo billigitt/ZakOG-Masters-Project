@@ -121,25 +121,37 @@ for t = tau+1:total_time+1 %tau+1 (Day tau) is the first you can start
 end
 
 %% Plots
+Printer=0
 
 figure(1)
 clf
+ax1 = subplot(2, 1, 1);
 
+
+yyaxis left
+
+h(1) = bar(days, I, 'FaceColor', C(5, :), 'LineStyle', 'none');
 %Plot Mean
+
+ylabel('Incidence')
+
+yyaxis right
 
 daysflip = [tau:total_time, total_time:-1:tau];
 inBetween = [Lower(tau+1:total_time+1), fliplr(Upper(tau+1:total_time+1))];
-h(1) = fill(daysflip, inBetween, [.75 .75 .75], 'LineWidth', 0.1, ...
+
+
+h(2) = fill(daysflip, inBetween, [.75 .75 .75], 'LineWidth', 0.1, ...
     'edgecolor', [1 1 1]);
 
 hold on
+h(3) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k', 'LineStyle', '-', 'LineWidth', 2);
 
-h(2) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
+plot([tau total_time], [2 2], 'k--', 'LineWidth', 1)
+
 
 %Plot Prior 95% CI. Useful when looking at failed epidemic
 
-plot([days(1) days(end)], [gaminv(0.975, a, b) gaminv(0.975, a, b)], 'color', C(2, :), 'LineStyle', '--')
-h(3) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'color', C(2, :), 'LineStyle', '--');
 % plot([days(1) days(end)], [a*b a*b], 'b--')
 
 %Plot ongoing 95% CI
@@ -147,27 +159,87 @@ h(3) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'col
 
 %Labels
 
-title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
-    ['$w_s = [0$ ',num2str(w_s), '] \& $\tau=$ ', num2str(tau), ' days']})
-ylabel('$\bar{R}_t$')
-xlabel('Time, $t$ (days)')
+% title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
+%     ['$w_s = [0$ ',num2str(w_s), '] \& $\tau=$ ', num2str(tau), ' days']})
 
+ylabel('$\tilde{R}_t$')
+xlabel('Time, $t$ (days)')
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+hyLabel.Position(2)=2;
 %Legend
 
 % legend(h([2]), '95 \% Confidence Interval')
 
-legend(h([2 1 3]), '$\bar{R}_t$', '95 \% Posterior CI', '95 \% Prior CI')
+legend(h([3 2 1]), '$\tilde{R}_t$', '95 \% Posterior CI', "Synthetic incidence data", 'Position', [0.55 0.8 0.2 0.1])
+
+ax = gca;
+ax.YAxis(1).Color = C(5, :);
+
+ax.YAxis(2).Color = 'k';
+
+
+
+ax2 = subplot(2, 1, 2);
+
+daysflip = [tau:total_time, total_time:-1:tau];
+inBetween = [Lower(tau+1:total_time+1), fliplr(Upper(tau+1:total_time+1))];
+
+plot([tau total_time], [2 2], 'k--', 'LineWidth', 1)
+hold on
+
+
+plot([days(1) days(end)], [gaminv(0.975, a, b) gaminv(0.975, a, b)], 'color', C(2, :), 'LineStyle', '--')
+h(1) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'color', C(2, :), 'LineStyle', '--');
+
+h(2) = fill(daysflip, inBetween, [.75 .75 .75], 'LineWidth', 0.1, ...
+    'edgecolor', [1 1 1]);
+
+h(3) = plot(tau:total_time, Mean(tau+1:total_time+1), 'k');
+
+
+
+%Plot Prior 95% CI. Useful when looking at failed epidemic
+
+plot([days(1) days(end)], [gaminv(0.975, a, b) gaminv(0.975, a, b)], 'color', C(2, :), 'LineStyle', '--')
+h(4) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'color', C(2, :), 'LineStyle', '--');
+% plot([days(1) days(end)], [a*b a*b], 'b--')
+
+%Plot ongoing 95% CI
+
+
+%Labels
+
+% title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
+%     ['$w_s = [0$ ',num2str(w_s), '] \& $\tau=$ ', num2str(tau), ' days']})
+ylabel('$\tilde{R}_t$')
+xlabel('Time, $t$ (days)')
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+hYLabel.Position(1) = -6.8;
+%Legend
+
+% legend(h([2]), '95 \% Confidence Interval')
+
+legend(h([3 2 1]), '$\bar{R}_t$', '95 \% Posterior CI', '95 \% Prior CI', 'Location', 'East')
+
+axis([0 70 0 20])
+
+ax1.FontSize = 18;
+ax2.FontSize = 18;
 
 Printer = 1;
 
 if Printer == 1
 %Save figure
-set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-saveas(gcf, 'Trivial_Estimate_CI.eps')
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 20], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
+saveas(gcf, 'Trivial_Estimate_CI.pdf')
 
-export_fig Trivial_Estimate_CI.eps -eps -r300 -painters -transparent
+export_fig Trivial_Estimate_CI.eps -pdf -r3Estima00 -painters -transparent
 
 end
+
+%%
 
 figure(2)
 clf
@@ -193,22 +265,25 @@ h(3) = plot([days(1) days(end)], [gaminv(0.025, a, b) gaminv(0.025, a, b)], 'col
 
 
 %Labels
+% 
+% title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
+%     ['$\mbox{\boldmath $w$} = [0$ ',num2str(w_s), '] \& $\tau=$ ', num2str(tau)', ' days']})
 
-title({['Trivial $R_t$ (=', num2str(R_t), ') inference with'];...
-    ['$w_s = [0$ ',num2str(w_s), '] \& $\tau=$ ', num2str(tau)', ' days']})
-ylabel('$\bar{R}_t$')
+title('Confidence intervals narrow with time')
+ylabel('$\tilde{R}_t$')
 xlabel('Time, $t$ (days)')
-
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+hYLabel.Position(1) = -1;
 %Legend
 
 % legend(h([2]), '95 \% Confidence Interval')
 
-legend(h([2 1 3]), '$\bar{R}_t$', '95 \% Posterior CI')
-0
-axis([0 78 1.5 2.8])
+legend(h([2 1 3]), '$\tilde{R}_t$', '95 \% Posterior CI')
 
-Printer = 1;
+axis([0 50 1.5 2.6])
 
+Printer=1
 if Printer == 1
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);

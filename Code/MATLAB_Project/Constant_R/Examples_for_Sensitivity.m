@@ -212,7 +212,7 @@ hold on
 % 
 % h(3) = fill(daysflip, inBetween_1_correct, C(1, :), 'LineStyle', 'none', 'FaceAlpha', 0.25);
 
-h(2) = fill(daysflip, inBetween_Area_1', 'k', 'LineStyle', 'none', 'FaceAlpha', 0.25);
+h(2) = fill(daysflip, inBetween_Area_1', [.75 .75 .75], 'LineStyle', 'none');
 
 h(4) = plot(tau+1:total_time, Mean_1_incorrect(tau+1:total_time), 'color', C(4, :));
 h(5) = plot(tau+1:switch_behaviour, Mean_1_correct(tau+1:switch_behaviour), 'color', C(1, :), 'LineStyle', '--');
@@ -220,18 +220,22 @@ h(6) = plot(switch_behaviour:total_time, Mean_1_correct(switch_behaviour:total_t
 
 h(7) = xline(switch_behaviour, '--', 'color', [.25 .25 .25]);
 
-xlabel('Time, $t$ (days)')
-ylabel('$\tilde{R}_t$ ')
+xlabel('Time, $t$ (days)', 'FontSize', 20)
+ylabel("$\tilde{R}_t$, inferred time-"+newline+"dependent reproduction number", 'FontSize', 20)
+hYLabel = get(gca,'YLabel');
+% set(hYLabel,'rotation',0,'VerticalAlignment','middle')
 
-legend(h([1 4 6 2]), '$R_t = 2$', 'Mean $\tilde{R}_t$ (original SI)', 'Mean $\tilde{R}_t$ (updated SI)', 'Non-normalised cumulative error', 'Location', 'East')
+title("Comparative inference"+newline+"when $R_t=2$ \& $\mu_{\mbox{\boldmath $\Delta$}}=0.7$", 'FontSize', 20)
 
-title('Comparative inference when $R_t=2$ \& $\mu_{\mbox{\boldmath $\Delta$}}=0.7$')
+set(gca, 'FontSize', 18)
 
+legend(h([1 4 6 2]), '$R_t = 5$', "Mean $\tilde{R}_t$"+newline+"(original SI)", "Mean $\tilde{R}_t$"+newline+"(updated SI)", "Non-normalised"+newline+"cumulative error", 'Location', 'SouthWest', 'FontSize', 16)
+Printer=2;
 if Printer == 2
 figure(3)
 % Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [20 15]);
-export_fig Report_Example_1_delta_eq_1.eps -eps -opengl
+export_fig Report_Example_1_delta_eq_1.eps -eps -r300 -painters -transparent
 
 % 
 % matlab2tikz('triagle.tex'); % black background
@@ -246,7 +250,7 @@ hold on
 % 
 % h(3) = fill(daysflip, inBetween_2_correct, C(1, :), 'LineStyle', 'none', 'FaceAlpha', 0.25);
 
-h(2) = fill(daysflip, inBetween_Area_2, 'k', 'LineStyle', 'none', 'FaceAlpha', 0.25);
+h(2) = fill(daysflip, inBetween_Area_2, [.75 .75 .75], 'LineStyle', 'none');
 
 
 h(4) = plot(tau+1:total_time, Mean_2_incorrect(tau+1:total_time), 'color', C(4, :));
@@ -255,18 +259,26 @@ h(6) = plot(switch_behaviour:total_time, Mean_2_correct(switch_behaviour:total_t
 
 h(7) = xline(switch_behaviour, '--', 'color', [.25 .25 .25]);
 
-xlabel('Time, $t$ (days)')
-ylabel('$\tilde{R}_t$ ')
+xlabel('Time, $t$ (days)', 'FontSize', 18)
+ylabel("$\tilde{R}_t$, inferred time-"+newline+"dependent reproduction number", 'FontSize', 18)
+hYLabel = get(gca,'YLabel');
+% set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+% hYLabel.Position(2) = 6;
 
-legend(h([1 4 6 2]), '$R_t = 5$', 'Mean $\tilde{R}_t$ (original SI)', 'Mean $\tilde{R}_t$ (updated SI)', 'Non-normalised cumulative error', 'Location', 'East')
+title("Comparative inference"+newline+"when $R_t=5$ \& $\mu_{\mbox{\boldmath $\Delta$}}=-0.7$", 'FontSize', 20)
 
-title('Comparative inference when $R_t=5$ \& $\mu_{\mbox{\boldmath $\Delta$}}=-0.7$')
+set(gca, 'FontSize', 18)
 
-if Printer == 2
+
+legend(h([1 4 6 2]), '$R_t = 5$', "Mean $\tilde{R}_t$"+newline+"(original SI)", "Mean $\tilde{R}_t$"+newline+"(updated SI)", "Non-normalised"+newline+"cumulative error", 'Location', 'NorthWest', 'FontSize', 16)
+
+Printer=1;
+
+if Printer == 1
 
 % Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [20 15]);
-export_fig Report_Example_2_delta_eq_1.eps -eps -opengl
+export_fig Report_Example_2_delta_eq_1.eps -eps -r300 -painters -transparent
 
 end
 

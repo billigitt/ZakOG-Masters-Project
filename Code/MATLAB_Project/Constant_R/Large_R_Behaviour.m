@@ -125,40 +125,57 @@ R_t = para_Linear_Vary.R_t;
 
 figure(1)
 clf
-plot(Days, Delta_Matrix(1, :, 1), 'color', C(1,:))
+h(1) = plot(Days, Delta_Matrix(1, :, 1), 'color', C(5,:)*0.5);
 
 hold on
 
 for i = 2:20
    
-    plot(Days, Delta_Matrix(1, :, i), 'color', C(1, :))
+    plot(Days, Delta_Matrix(1, :, i), 'color', C(5, :)*0.5)
     
 end
 
 for i = 21:40
    
-    plot(Days, Delta_Matrix(1, :, i), 'color', C(2, :))
+    h(2) = plot(Days, Delta_Matrix(1, :, i), 'color', C(5, :)*0.7)
     
 end
 
 for i = 41:60
    
-    plot(Days, Delta_Matrix(1, :, i), 'color', C(3, :))
+    h(3) = plot(Days, Delta_Matrix(1, :, i), 'color', C(5, :))
     
 end
 
 for i = 61:80
    
-    plot(Days, Delta_Matrix(1, :, i), 'color', C(4, :))
+    h(4) = plot(Days, Delta_Matrix(1, :, i), 'color', C(5, :)/0.8)
     
 end
 
 for i = 81:100
    
-    plot(Days, Delta_Matrix(1, :, i), 'color', C(5, :))
+    h(5) = plot(Days, Delta_Matrix(1, :, i), 'color', C(5, :)/0.62)
     
 end
 
+legend(h([1 2 3 4 5]),  strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(1),'%4.2f'),'$,$', num2str(mu_d(20),'%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(21),'%4.2f'),'$,$', num2str(mu_d(40),'%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(41),'%4.2f'),'$,$', num2str(mu_d(60),'%4.2f'), '$)$'),strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(61),'%4.2f'),'$,$', num2str(mu_d(80),'%4.2f'), '$)$'),strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(81),'%4.2f'),'$,$', num2str(mu_d(100),'%4.2f'), '$)$'), 'Location', 'North')
+
+xlabel('Interval, $t$ (days)')
+ylabel('Misspecification, $\mbox{\boldmath{$\Delta$}}_t$')
+
+set(gca, 'FontSize', 18)
+
+Printer=1;
+
+if Printer == 1
+
+%Save figure
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [20 15]);
+saveas(gcf, 'Quadratic_Delta.eps')
+export_fig Quadratic_Delta.eps -eps -r300 -painters -transparent
+
+end
 
 
 %This figure should tell us when to expect R>1 or R<1  and for what mu
@@ -207,27 +224,48 @@ c = colorbar;
 set(c,'TickLabelInterpreter','latex')
 ylabel(c, '$h(r(R_t))$', 'Interpreter', 'latex')
 
+
+
 % legend(h, 'Numerical solve for $v(R(r)) \cdot  \mu_{\Delta}=0$', 'Location', 'SouthEast')
-%%
+
 
 figure(6)
 clf
-imagesc(R_t, mu_d, Ratio)
+[c, h] = contourf(R_t, mu_d, Ratio, 'ShowText', 'off','LineColor', 'none');
+set(h,'LineColor','flat')
+clabel(c,h, 'manual', 'FontSize', 14);
 colormap parula
 hold on
 
 % h = plot(R_star, mu_d, 'k', 'LineStyle', '--');
 xlabel('True $R_t$')
-ylabel('$\mu_{\mbox{\boldmath $\Delta$}}$')
+ylabel('Mean misspecification, $\mu_{\mbox{\boldmath $\Delta$}}$')
 set(gca,'YDir','normal')
+hYLabel = get(gca,'YLabel');
+% set(hYLabel,'rotation',0,'VerticalAlignment','middle')
 
-c = colorbar;
-set(c,'TickLabelInterpreter','latex')
-ylabel(c, '$h(r(R_t))$', 'Interpreter', 'latex')
+% title("$h(R_t)$ behaviour for large $R_t$ appears"+newline+"to plateau and increase monotonically, for $\alpha=2$")
+
+% c = colorbar;
+% set(c,'TickLabelInterpreter','latex')
+% ylabel(c, '$h(r(R_t))$', 'Interpreter', 'latex')
 
 % legend(h, 'Numerical solve for $0 = \mu_{\Delta} \cdot $\boldmath$v$ $_R$', 'Location', 'SouthEast')
 
-% legend(h, 'Numerical solve for $\mbox{\boldmath $v$}(r(R_t))\cdot\mbox{\boldmath $\Delta$}=0$', 'Location', 'SouthEast')
+legend(h, '$h(R_t)$', 'Location', 'SouthEast')
+
+Printer = 1;
+
+set(gca, 'FontSize', 18)
+
+if Printer == 1
+figure(6)
+%Save figure
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [20 15]);
+saveas(gcf, 'Large_R_Contour.eps')
+export_fig Large_R_Contour.eps -eps -r300 -painters -transparent
+
+end
 
 figure(7)
 clf
@@ -262,22 +300,37 @@ hold on
 h(2) = semilogy(X, (10^c)*X.^m, 'color', C(4, :));
 
 ylabel('$g(R_t)$')
-xlabel('$R_t$')
+xlabel('True $R_t$')
 
-title('Empirical evidence supporting $\lim_{r \rightarrow \infty} h(r) = \frac{w_1^a}{w_1^o}$')
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+hYLabel.Position(2) = .3;
+%title("Numerical evidence"+newline+"supporting $\lim_{r \rightarrow \infty} h(r) = \beta$")
+set(gca, 'FontSize', 18)
+legend(h, '$g(R_t) = |(\mbox{\boldmath $h$}(R_t)- \mbox{\boldmath $\beta$})\cdot \mbox{\boldmath $1$}|/|\mbox{\boldmath $\beta$}|$', '$g(R_t) = 10^{0.435}\cdot x^{-1.00360}$', 'Location', 'NorthWest')
 
-legend(h, '$g(R_t) = |(\mbox{\boldmath $h$}(R_t)- \mbox{\boldmath $w$})\cdot \mbox{\boldmath $1$}|/|\mbox{\boldmath $w$}|$', '$g(R_t) = 10^{0.435}\cdot x^{-1.00360}$', 'Location', 'NorthWest')
-
-axes('position',[.45 .4 .4 .25])
+axes('position',[.3 .4 .55 .35])
 box on % put box around new pair of axes
 indexOfInterest = (X < 400) & (X > 0.01); % range of t near perturbation
-semilogy(R_t(indexOfInterest),error_long_term_estimate(indexOfInterest), 'o', 'color', C(2, :)) % plot on new axes
+loglog(R_t,error_long_term_estimate, 'o', 'color', C(2, :)) % plot on new axes
 axis tight
 
 hold on
-semilogy(X(indexOfInterest), (10^c)*X(indexOfInterest).^m, 'color', C(4, :))
+loglog(X, (10^c)*X.^m, 'color', C(4, :))
 
+ylabel('$\mathrm{log}_{10}(g(R_t))$')
+xlabel('$\mathrm{log}_{10}(R_t)$')
+Printer = 1;
+set(gca, 'FontSize', 18)
 
+if Printer == 1
+
+%Save figure
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [20 15]);
+saveas(gcf, 'lim_inf_h.eps')
+export_fig lim_inf_h.eps -eps -r300 -painters -transparent
+
+end
 
 
 figure(9)

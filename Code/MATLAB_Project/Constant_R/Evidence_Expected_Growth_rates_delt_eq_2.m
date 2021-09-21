@@ -112,7 +112,12 @@ Num_Sims = 100;
 
 [Mean_Dif_NonAbs, Area_Dif_NonAbs, ~] = Sensitivity_Analysis_NonAbs(Key, para, para_Linear_Vary, 'Perfect', 'Trivial_and_Expectation', 'Non-Hybrid');
 
+[Ratio, ~] = Sensitivity_Analysis_H(Key, para, para_Linear_Vary, 'Perfect', 'Trivial_and_Expectation', 'Non-Hybrid');
+
+
 %% Plots
+
+Printer=0;
 
 R_t = para_Linear_Vary.R_t
 
@@ -155,15 +160,20 @@ for i = 81:100
     
 end
 
-legend(h([1 2 3 4 5]),  strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(1), '%4.2f'),'$,$', num2str(mu_d(20), '%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(21), '%4.2f'),'$,$', num2str(mu_d(40), '%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(41), '%4.2f'),'$,$', num2str(mu_d(60), '%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(61), '%4.2f'),'$,$', num2str(mu_d(80), '%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(81), '%4.2f'),'$,$', num2str(mu_d(100), '%4.2f'), '$)$'), 'Location', 'best')
+legend(h([1 2 3 4 5]),  strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(1), '%4.2f'),'$,$', num2str(mu_d(20), '%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(21), '%4.2f'),'$,$', num2str(mu_d(40), '%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(41), '%4.2f'),'$,$', num2str(mu_d(60), '%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(61), '%4.2f'),'$,$', num2str(mu_d(80), '%4.2f'), '$)$'), strcat('$\mu_{\mbox{\boldmath $\Delta$}} \in ($', num2str(mu_d(81), '%4.2f'),'$,$', num2str(mu_d(100), '%4.2f'), '$)$'), 'Location', 'North')
 
 xlabel('Interval, $t$ (days)')
-ylabel('$\mbox{\boldmath{$\Delta$}}(t)$')
+ylabel('$\Delta_t$')
 
 hYLabel = get(gca,'YLabel');
 set(hYLabel,'rotation',0,'VerticalAlignment','middle')
 hYLabel.Position(1) = -1.23;
-title({'Distribution of';'quadratic \mbox{\boldmath$\Delta$} distributions for $\sigma^2_{\mbox{\boldmath$\Delta$}}$ \& $\alpha=2$'})
+hYLabel.Position(2) = 0.05;
+% title({'Distribution of';'quadratic \mbox{\boldmath$\Delta$} distributions for $\sigma^2_{\mbox{\boldmath$\Delta$}}$ \& $\alpha=2$'})
+
+set(gca, 'FontSize', 18)
+
+Printer=1;
 
 if Printer == 1
 
@@ -207,26 +217,28 @@ plot(mu_d, R_star)
 
 f = figure(5);
 clf
-subplot(2, 11, [1 9])
+ax1 = subplot(2, 11, [1 9])
+
 
 imagesc(R_t, mu_d, Area_Dif.^(1/3))
 colormap bone
 colormap(f, flipud(colormap(f)))
 
 % xlabel('True $R_t$')
-ylabel('$\mu_{\mbox{\boldmath $\Delta$}}$')
+ylabel('Mean mis-specification, $\mu_{\mbox{\boldmath $\Delta$}}$')
 hYLabel = get(gca,'YLabel');
-set(hYLabel,'rotation',0,'VerticalAlignment','middle')
-hYLabel.Position(1) = -.7;
+% set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+% hYLabel.Position(1) = -.7;
 set(gca,'YDir','normal')
-title({'Inaccurate generation interval estimates may lead';'to accurate $R_t$ inference for non-trivial dynamics'})
+% hYLabel.Position(2) = -.05;
+%title({'Inaccurate generation interval estimates may lead';'to accurate $R_t$ inference for non-trivial dynamics'})
 % c = colorbar;
 % set(c,'TickLabelInterpreter','latex')
 % ylabel(c, '$\sqrt{\frac{\int^{T_e}_{T_i} |\tilde{R}_t^o(s) - \tilde{R}_t^a(s)| \mathrm{d}s}{\int^{T_e}_{T_i} \tilde{R}_t^a(s) \mathrm{d}s}}$', 'Interpreter', 'latex')
 
 % legend(h, 'Numerical solve for $v(R(r)) \cdot  \mu_{\Delta}=0$', 'Location', 'SouthEast')
 
-subplot(2, 11, [12 20])
+ax2 = subplot(2, 11, [12 20])
 imagesc(R_t, mu_d, Area_Dif.^(1/3))
 colormap bone
 colormap(f, flipud(colormap(f)))
@@ -235,11 +247,12 @@ hold on
 
 h = plot(R_star, mu_d, 'k', 'LineStyle', '--');
 xlabel('True $R_t$')
-ylabel('$\mu_{\mbox{\boldmath $\Delta$}}$')
+ylabel('Mean mis-specification, $\mu_{\mbox{\boldmath $\Delta$}}$')
 set(gca,'YDir','normal')
 hYLabel = get(gca,'YLabel');
-set(hYLabel,'rotation',0,'VerticalAlignment','middle')
-hYLabel.Position(1) = -.7;
+% set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+% hYLabel.Position(1) = -.7;
+% hYLabel.Position(2) = -.05;
 
 % hp4 = get(subplot(2,2,3),'Position');
 
@@ -250,10 +263,12 @@ ylabel(c, '$\bigg( \frac{\int^{T_e}_{T_i} |\tilde{R}_t^o(s) - \tilde{R}_t^a(s)| 
 %legend(h, {"Numerical solve for"+newline+"$v(R(r)) \cdot  \mu_{\Delta}=0$"}, 'Location', 'SouthEast')
 
 
-legend(h, {"Numerical solve for"+newline+" $v(R(r)) \cdot  \mu_{\mbox{\boldmath $\Delta$}}=0$"}, 'Location', 'SouthEast')
+legend(h, {"Numerical solve for"+newline+"$\mbox{\boldmath $v$}(R_t(r)) \cdot  \mbox{\boldmath $\Delta $}=0$"}, 'Location', 'SouthEast')
 
+ax1.FontSize = 18;
+ax2.FontSize = 18;
 
-if Printer == 0
+if Printer == 1
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 20], 'PaperUnits', 'centimeters', 'PaperSize', [20 20]);
 saveas(gcf, 'Significant_Finding_1.eps')
@@ -267,8 +282,9 @@ clf
 
 [X,Y] = meshgrid(R_t,mu_d);
 H = surf(X, Y, log2(1+tanh(10*Area_Dif_NonAbs)))
+
 colormap parula
-colormap(f, flipud(colormap(f)))
+% colormap(f, flipud(colormap(f)))
 H.EdgeColor = 'none';
 
 hold on
@@ -289,7 +305,7 @@ ylabel(c, '$\sqrt{\frac{ | \tilde{R}_t^o(T_e) - \tilde{R}_t^a(T_e)|}{\tilde{R}_t
 
 % legend(h, 'Numerical solve for $0 = \mu_{\Delta} \cdot $\boldmath$v$ $_R$', 'Location', 'SouthEast')
 
-legend(h, {"Numerical solve for"+newline+"$v(R(r)) \cdot  \mu_{\Delta}=0$"}, 'Location', 'SouthEast')
+legend(h, {"Numerical solve for"+newline+"$v(R_t(r)) \cdot  \mu_{\Delta}=0$"}, 'Location', 'SouthEast')
 
 % figure(10)
 % 
@@ -300,4 +316,119 @@ legend(h, {"Numerical solve for"+newline+"$v(R(r)) \cdot  \mu_{\Delta}=0$"}, 'Lo
 % plot(x, log(1+x), 'b')
 % plot(x, log10(1+x), 'r')
 
+%
+%%
+f = figure(7);
+clf
+ax2 = subplot(1, 2, 2);
+% imagesc(R_t, mu_d, log2(1+tanh(10*Area_Dif_NonAbs)))
 
+[X,Y] = meshgrid(R_t,mu_d);
+[c, h] = contourf(X, Y, tanh(30*(Ratio-1)), 'ShowText', 'off', 'LineColor', 'none');
+set(h,'LineColor','flat')
+% clabel(c,h,'Color','k', 'Interpreter', 'latex', 'LabelSpacing', 1500);
+
+colormap(parula(10))
+colormap(f, flipud(colormap(f)))
+hold on
+
+axis([0.1 6 -0.6 0.3])
+
+h(1) = plot(R_star,mu_d, 'k');
+% colormap(f, flipud(colormap(f)))
+% H.EdgeColor = 'none';
+
+% hold on
+% 
+% plane = zeros(size(Area_Dif_NonAbs));
+% 
+% G = surf(X, Y, plane, 'FaceColor', 'k', 'FaceAlpha', 0.5);
+% G.EdgeColor = 'none';
+
+% h = plot3(R_star, mu_d, 'k', 'LineStyle', '--');
+xlabel('True $R_t$')
+% ylabel('$\mu_{\mbox{\boldmath $\Delta$}}$')
+set(gca,'YDir','normal')
+
+c=colorbar
+
+% c = colorbar('XTickLabel',{'$1-5 \times 10^{-9}$', '$1-4 \times 10^{-9}$', '$1-3 \times 10^{-9}$', '$1-2 \times 10^{-9}$', '$1-10^{-9}$', '1'}, ...
+%                'XTick', 0.999999995:0.000000001:1);
+set(c,'TickLabelInterpreter','latex')
+ylabel(c, '$\mathrm{tanh}(30(h(R_t)-1))$', 'Interpreter', 'latex', 'FontSize', 18)
+% legend(h, 'Numerical solve for $0 = \mu_{\Delta} \cdot $\boldmath$v$ $_R$', 'Location', 'SouthEast')
+
+% legend(h(1), {"Numerical solve for"+newline+"$\mbox{\boldmath{$v$}}(R_t(r)) \cdot  \mbox{\boldmath{$\Delta$}}=0$"}, 'Location', 'best')
+
+% legend(h, {"Numerical solve for"+newline+"$v(R(r)) \cdot  \mu_{\Delta}=0$"}, 'Location', 'SouthEast')
+
+% figure(10)
+% 
+% x = 0.0001-1:0.0001:10;
+% 
+% plot(x, log2(1+x), 'k')
+% hold on
+% plot(x, log(1+x), 'b')
+% plot(x, log10(1+x), 'r')
+
+ax1 = subplot(1, 2, 1)
+% imagesc(R_t, mu_d, log2(1+tanh(10*Area_Dif_NonAbs)))
+
+[X,Y] = meshgrid(R_t,mu_d);
+[c, h(1)] = contourf(X, Y, Ratio, [0.9 1.5 2 2.5 3 3.5 4 4.5 5], 'ShowText', 'on', 'LineColor', 'none');
+set(h(1),'LineColor','flat')
+clabel(c,h(1),'Color','k', 'Interpreter', 'latex', 'LabelSpacing', 20000, 'FontSize', 18);
+% colormap(f, flipud(colormap(f)))
+% [X,Y] = meshgrid(R_t,mu_d);
+% [c, h] = contourf(X, Y, log2(1+tanh(10*Ratio)), 'ShowText', 'on', 'LineColor', 'none');
+% set(h,'LineColor','flat')
+% clabel(c,h,'Color','k', 'Interpreter', 'latex');
+
+% colormap parula
+% colormap(f, flipud(colormap(f)))
+% H.EdgeColor = 'none';
+% 
+% hold on
+% 
+% plane = zeros(size(Area_Dif_NonAbs));
+% 
+% G = surf(X, Y, plane, 'FaceColor', 'k', 'FaceAlpha', 0.5);
+% G.EdgeColor = 'none';
+
+hold on
+
+h(2) = plot(R_star,mu_d, 'k');
+
+% h = plot3(R_star, mu_d, 'k', 'LineStyle', '--');
+xlabel('True $R_t$')
+ylabel("Mean"+newline+"mis-specification, $\mu_{\mbox{\boldmath $\Delta$}}$")
+hYLabel = get(gca,'YLabel');
+% set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+set(gca,'YDir','normal')
+% hYLabel.Position(2) = -.035;
+% c = colorbar;
+% set(c,'TickLabelInterpreter','latex')
+% ylabel(c, '$\sqrt{\frac{ | \tilde{R}_t^o(T_e) - \tilde{R}_t^a(T_e)|}{\tilde{R}_t^a(T_e)}}$', 'Interpreter', 'latex')
+
+% legend(h, 'Numerical solve for $0 = \mu_{\Delta} \cdot $\boldmath$v$ $_R$', 'Location', 'SouthEast')
+
+legend(h([1 2]), {"$h(R_t)$", "Numerical solve"+newline+"for $h(R_t)=1$"}, 'Position', [0.3 0.725 0.15 0.1])
+
+%t = title('Shape of $h(R_t)$ matches with mathematical analysis, for $\alpha=2$')
+
+% t.Position(1) = 6.7;
+
+Printer=1;
+
+axis([0.1 6 -0.6 0.3])
+
+ax1.FontSize = 20;
+ax2.FontSize= 20;
+
+if Printer == 1
+%Save figure
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 36 16], 'PaperUnits', 'centimeters', 'PaperSize', [36 16]);
+saveas(gcf, 'Contour_delt_eq_2.eps')
+export_fig Contour_delt_eq_2.eps -eps -r300 -painters -transparent
+
+end

@@ -1,0 +1,112 @@
+\documentclass[10pt]{standalone}
+\usepackage{tikz}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{bbm}
+\usepackage[margin=1in]{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{ decorations.markings}
+\usepackage[RPvoltages]{circuitikz}
+
+\usetikzlibrary{decorations.pathreplacing,angles,quotes}
+
+\usepackage{tikz,bm} % Useful for drawing plots
+
+\usetikzlibrary{shapes.geometric, arrows}
+\tikzstyle{process1} = [rectangle, draw = black, rounded corners, minimum width=0.8cm, minimum height=0.8cm, text centered, line width=0.5mm]
+\tikzstyle{process2} = [rectangle, rounded corners, draw= red, minimum width=0.8cm, minimum height=0.8cm, text centered, line width=0.5mm]
+
+\tikzstyle{process3} = [rectangle, draw = orange, rounded corners, minimum width=0.8cm, minimum height=0.8cm, text centered, line width=0.5mm]
+\tikzstyle{legend} = [rectangle, minimum width=5cm, minimum height=2cm, , draw=black,fill=white, line width=1mm]
+\tikzstyle{legend2} = [rectangle, minimum width=5cm, minimum height=3cm, , draw=black,fill=white, line width=1mm]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usepackage{circuitikz}
+
+
+\usepackage{genealogytree}
+\gtruselibrary{templates}
+\usetikzlibrary{arrows.meta,positioning}
+\usepackage[figurename=Figure]{caption} %
+\usepackage{amsfonts} %
+\usepackage{xcolor} %
+\usepackage{enumitem}
+
+\usetikzlibrary{shapes.multipart}
+
+\usepackage{xcolor}
+\usepackage{pagecolor}
+\usepackage{lipsum}  
+\usepackage{mdframed}
+
+\pagecolor{black}
+
+
+\usetikzlibrary{fadings, shadings}
+\newcounter{fadcnt}\setcounter{fadcnt}{0}
+\newcommand\fadingtext[3][]{%
+	\stepcounter{fadcnt}
+	\begin{tikzfadingfrompicture}[name=fading letter\thefadcnt]
+		\node[text=transparent!0,inner xsep=0pt,outer xsep=0pt,#1] {#3};
+	\end{tikzfadingfrompicture}%
+	\begin{tikzpicture}[baseline=(textnode.base)]
+	\node[inner sep=0pt,outer sep=0pt,#1](textnode){\phantom{#3}}; 
+	\shade[path fading=fading letter\thefadcnt,#2,fit fading=false]
+	(textnode.south west) rectangle (textnode.north east);% 
+	\end{tikzpicture}% 
+}
+\usetikzlibrary{calc}
+\newbox\shbox
+\tikzset{%
+	path picture shading/.style={%
+		path picture={%
+			%
+			\pgfpointdiff{\pgfpointanchor{path picture bounding box}{south west}}%
+			{\pgfpointanchor{path picture bounding box}{north east}}%
+			\pgfgetlastxy\pathwidth\pathheight%
+			\pgfinterruptpicture%
+			\global\setbox\shbox=\hbox{\pgfuseshading{#1}}%
+			\endpgfinterruptpicture%
+			\pgftransformshift{\pgfpointanchor{path picture bounding box}{center}}%
+			\pgftransformxscale{\pathwidth/(\wd\shbox)}%
+			\pgftransformyscale{\pathheight/(\ht\shbox)}% \dp will (should) be 0pt
+			\pgftext{\box\shbox}%
+			%
+		}
+	}
+}
+\definecolor{silver}{rgb}{0.75, 0.75, 0.75}
+\pgfdeclarehorizontalshading{rainbow}{10bp}{color(0bp)=(white);
+	color(1.6667bp)=(white);
+	color(3.3333bp)=(white);
+	color(5bp)=(silver);
+	color(6.6667bp)=(white);
+	color(8.3333bp)=(silver);
+	color(10bp)=(white)}
+
+
+
+
+\date{}
+\begin{document}
+	
+		\centering
+		\begin{tikzpicture}[every text node part/.style={align=center}]
+		
+		\node (Origin) {\Huge \fadingtext[scale=10, font=\bfseries]{path picture shading=rainbow}{$\boldsymbol{\Delta$}}\\};
+		\node (Data) [below = -0.1cm of  Origin] {\tiny data};
+		\draw[silver, very thick] (0.5,0.7) -- (0.5,-0.95);
+		\end{tikzpicture}
+		
+	
+\end{document}
+
+\\

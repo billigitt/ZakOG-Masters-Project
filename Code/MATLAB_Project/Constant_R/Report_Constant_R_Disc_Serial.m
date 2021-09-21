@@ -70,27 +70,27 @@ w_actual_3 = [w_s_o; w_s_a3];
 
 w_actual_4 = [w_s_o; w_s_a4];
 
-switch_behaviour = 40;
+switch_behaviour = 25;
 
 delay = 0;
 
 update_behaviour = switch_behaviour + delay;
 
-para_1_incorrect = struct('seed', 1, 'total_time', total_time, 'w_s_all_actual', w_actual_1, 'w_s_all_recorded', w_control, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
+para_1_incorrect = struct('seed', 100, 'total_time', total_time, 'w_s_all_actual', w_actual_1, 'w_s_all_recorded', w_control, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 
-para_2_incorrect = struct('seed', 1, 'total_time', total_time, 'w_s_all_actual', w_actual_2, 'w_s_all_recorded', w_control, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
+para_2_incorrect = struct('seed', 4, 'total_time', total_time, 'w_s_all_actual', w_actual_2, 'w_s_all_recorded', w_control, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 
-para_3_incorrect = struct('seed', 1, 'total_time', total_time, 'w_s_all_actual', w_actual_3, 'w_s_all_recorded', w_control, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
+para_3_incorrect = struct('seed', 4, 'total_time', total_time, 'w_s_all_actual', w_actual_3, 'w_s_all_recorded', w_control, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 
-para_4_incorrect = struct('seed', 1, 'total_time', total_time, 'w_s_all_actual', w_actual_4, 'w_s_all_recorded', w_control, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
+para_4_incorrect = struct('seed', 4, 'total_time', total_time, 'w_s_all_actual', w_actual_4, 'w_s_all_recorded', w_control, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 
-para_1_correct = struct('seed', 1, 'total_time', total_time, 'w_s_all_actual', w_actual_1, 'w_s_all_recorded', w_actual_1, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
+para_1_correct = struct('seed', 100, 'total_time', total_time, 'w_s_all_actual', w_actual_1, 'w_s_all_recorded', w_actual_1, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 
-para_2_correct = struct('seed', 1, 'total_time', total_time, 'w_s_all_actual', w_actual_2, 'w_s_all_recorded', w_actual_2, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
+para_2_correct = struct('seed', 4, 'total_time', total_time, 'w_s_all_actual', w_actual_2, 'w_s_all_recorded', w_actual_2, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 
-para_3_correct = struct('seed', 1, 'total_time', total_time, 'w_s_all_actual', w_actual_3, 'w_s_all_recorded', w_actual_3, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
+para_3_correct = struct('seed', 4, 'total_time', total_time, 'w_s_all_actual', w_actual_3, 'w_s_all_recorded', w_actual_3, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 
-para_4_correct = struct('seed', 1, 'total_time', total_time, 'w_s_all_actual', w_actual_4, 'w_s_all_recorded', w_actual_4, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
+para_4_correct = struct('seed', 4, 'total_time', total_time, 'w_s_all_actual', w_actual_4, 'w_s_all_recorded', w_actual_4, 'switch_behaviour', switch_behaviour, 'update_behaviour', update_behaviour, 'tau', tau, 'a', 1, 'b', 5, 'I_0', 10);
 
 para_Trivial = struct('R_t', 2);
 
@@ -132,7 +132,7 @@ inBetween_4_correct = [Lower_4_correct(tau+1:total_time), fliplr(Upper_4_correct
 
 %%
 figure(1)
-
+clf
 h(1) = plot(x, w_s_o, 'k');
 hold on
 h(2) = plot(x, w_s_a1, 'color', C(1, :));
@@ -142,17 +142,22 @@ h(5) = plot(x, w_s_a4, 'color', C(1, :), 'LineStyle', ':');
 
 axis([0 15 0 0.45])
 
-legend(h(1), 'Original')
+legend(h([1 2 3 4 5 ]), {"Original, $\mbox{\boldmath{$w$}}^o$", "Increased mean,"+newline+"$\mu_{\mbox{\boldmath{$\Delta$}}}>0$", "Decreased mean,"+newline+"$\mu_{\mbox{\boldmath{$\Delta$}}}<0$", "Increased variance,"+newline+" $\sigma^2_a-\sigma^2_o>0$", "Decreased variance,"+newline+"$\sigma^2_a-\sigma^2_o<0$"}, 'Location', 'NorthWest')
 
-title('Serial interval updates')
+%legend(h([1 2 3 4]), ["Original", "Increased mean, $\mu_{\mbox{\boldmath{$\Delta$}}}>0$", "Decreased mean, $\mu_{\mbox{\boldmath{$\Delta$}}}<0$"], 'Location', 'best')
+
+% title('ExSerial interval updates')
 xlabel('Interval, $t$ (days)')
-ylabel('Probability')
+ylabel('$w_i$, Generation interval probability')
 
-if Printer == 1
+set(gca, 'FontSize', 18)
+
+if Printer == 2
 
 % Save figure
-set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-export_fig Report_Constant_R_Disc_Serial_0.eps -eps
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [20 15]);
+
+export_fig Report_Constant_R_Disc_Serial_0.eps -eps -transparent
 
 % 
 % matlab2tikz('triagle.tex'); % black background
@@ -178,18 +183,19 @@ if Printer == 1
 
 % Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
+
 export_fig Report_Constant_R_Disc_Serial_0_Default.eps -eps -opengl
 
 end
 
 %%
-figure(3)
+ax = figure(3);
 clf
-h(1) = plot([0 total_time], [para_Trivial.R_t para_Trivial.R_t], 'color', [.5 .5 .5], 'LineWidth', 1.5);
-hold on
-h(2) = fill(daysflip, inBetween_1_incorrect, C(4, :), 'LineStyle', 'none', 'FaceAlpha', 0.25);
 
+h(2) = fill(daysflip, inBetween_1_incorrect, C(4, :), 'LineStyle', 'none', 'FaceAlpha', 0.25);
+hold on
 h(3) = fill(daysflip, inBetween_1_correct, C(1, :), 'LineStyle', 'none', 'FaceAlpha', 0.25);
+h(1) = plot([0 total_time], [para_Trivial.R_t para_Trivial.R_t], 'color', [.5 .5 .5], 'LineWidth', 1.5);
 
 h(4) = plot(tau+1:total_time, Mean_1_incorrect(tau+1:total_time), 'color', C(4, :));
 h(5) = plot(tau+1:switch_behaviour, Mean_1_correct(tau+1:switch_behaviour), 'color', C(1, :), 'LineStyle', '--');
@@ -198,19 +204,24 @@ h(6) = plot(switch_behaviour:total_time, Mean_1_correct(switch_behaviour:total_t
 h(7) = xline(switch_behaviour, '--', 'color', [.25 .25 .25]);
 
 xlabel('Time, $t$ (days)')
-ylabel('$\tilde{R}_t$ ')
+ylabel("Inferred time-dependent"+newline+"reproduction number, $\tilde{R}_t$")
 
-legend(h([1 4 6 2 3]), '$R_t = 2$', 'Mean $\tilde{R}_t$ (original SI)', 'Mean $\tilde{R}_t$ (updated SI)', '95 \% CI (original SI)', '95 \% CI (updated SI)')
+yticks([1 2 3])
+xticks([0 25 50 75 100])
+axis([25 100 1.35 3])
+legend(h([1 4 6]), 'True $R_t = 2$', 'Actual inference, $\tilde{R}^o_t$', 'Perfect inference, $\tilde{R}^a_t$')
+set(gca,'FontSize',18)
+% title('SI updates from $\tilde{N}(8, 2)$ to $\tilde{N}(10, 2)$')
 
-title('SI updates from $\tilde{N}(8, 2)$ to $\tilde{N}(10, 2)$')
-
-if Printer == 1
+if Printer == 2
 
 % Save figure
-set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-export_fig Report_Constant_R_Disc_Serial_1.eps -eps -opengl
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [20 15]);
+% set(gca, 'Color', 'none')
+% export_fig Report_Constant_R_Disc_Serial_1.pdf -pdf -opengl
+saveas(gcf, 'Report_Constant_R_Disc_Serial_1_new.pdf')
 
-% 
+export_fig('Report_Constant_R_Disc_Serial_1.eps','transparent')
 % matlab2tikz('triagle.tex'); % black background
 
 end
