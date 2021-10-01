@@ -38,37 +38,37 @@ I_Gen = 0.3*1+0.5*2+0.2*1;
 
 hf = figure(1);
 clf
-% scale_flip_w_s_o = 32/max(w_s_f)*fliplr(w_s_o);
-ax1 = subplot(2, 2, 1)
-bar([0 x], [0 w_s_o], 'BarWidth', 0.2, 'FaceColor', C(1, :))
-xticks([0 1 2 3])
-
-
-
-% ha = annotation('arrow');
-% ha.Parent = hf.CurrentAxes;
-% ha.HeadStyle = 'deltoid';
-% ha.X = [x(45) 15];
-% ha.Y = [scale_flip_w_s_o(45) scale_flip_w_s_o(45)];
+% % scale_flip_w_s_o = 32/max(w_s_f)*fliplr(w_s_o);
+% ax1 = subplot(2, 2, 1)
+% bar([0 x], [0 w_s_o], 'BarWidth', 0.2, 'FaceColor', C(1, :))
+% xticks([0 1 2 3])
 % 
-% hb = annotation('arrow');
-% hb.Parent = hf.CurrentAxes;
-% hb.HeadStyle = 'deltoid';
-% hb.X = [15 x(45)];
-% hb.Y = [scale_flip_w_s_o(45) scale_flip_w_s_o(45)];
-
-% set(gca, 'ytick', [])
-% xticks([0 x(45) 15])
-% xticklabels({'$T$', '$t$', '0'})
-
-% ht = text(0.5*(15+x(45)), scale_flip_w_s_o(45)+5, {'Time between';'symptoms appearing';'in subsequent infections'}, 'interpreter', 'latex', 'FontSize', 13);
-% set(ht,'visible','on','HorizontalAlignment','center','VerticalAlignment','middle')
-
-ylabel("GI probability")
-
-xlabel('Interval (days)')
-hYLabel = get(gca,'YLabel');
-hYLabel.Position(1) = -1.62;
+% 
+% 
+% % ha = annotation('arrow');
+% % ha.Parent = hf.CurrentAxes;
+% % ha.HeadStyle = 'deltoid';
+% % ha.X = [x(45) 15];
+% % ha.Y = [scale_flip_w_s_o(45) scale_flip_w_s_o(45)];
+% % 
+% % hb = annotation('arrow');
+% % hb.Parent = hf.CurrentAxes;
+% % hb.HeadStyle = 'deltoid';
+% % hb.X = [15 x(45)];
+% % hb.Y = [scale_flip_w_s_o(45) scale_flip_w_s_o(45)];
+% 
+% % set(gca, 'ytick', [])
+% % xticks([0 x(45) 15])
+% % xticklabels({'$T$', '$t$', '0'})
+% 
+% % ht = text(0.5*(15+x(45)), scale_flip_w_s_o(45)+5, {'Time between';'symptoms appearing';'in subsequent infections'}, 'interpreter', 'latex', 'FontSize', 13);
+% % set(ht,'visible','on','HorizontalAlignment','center','VerticalAlignment','middle')
+% 
+% ylabel("GI probability")
+% 
+% xlabel('Interval (days)')
+% hYLabel = get(gca,'YLabel');
+% hYLabel.Position(1) = -1.62;
 
 % title("$R_t$ inference visualised via $\mbox{\boldmath $ I$}_t \cdot \mathrm{flip}(\mbox{\boldmath $ w$})$", 'Position', [4.6 0.65])
 
@@ -79,24 +79,44 @@ bar(y, [fliplr(w_s_o) 0], 'BarWidth', 0.2, 'FaceColor', C(1, :))
 xticks([1 2 3 4])
 xticklabels({'3', '2', '1', '0'})
 xlabel('Interval (days)')
+
+ylabel("GI probability")
+hYLabel = get(gca,'YLabel');
+hYLabel.Position(1) = -0.8;
+
 ax = subplot(2, 2, 4)
 ax.Clipping = 'off'
-h(1) = bar(y, I, 'FaceColor', [.75 .75 .75]);
+b1 = bar(y, I, 'FaceColor', [.75 .75 .75]);
 hold on
 
-h(2) = bar(fliplr(w_s_o)*20/6, 'FaceColor', C(1, :), 'BarWidth', 0.2);
+% h=bar(y(4), I(4))
+% set(h,'EdgeColor', 'red', 'FaceColor', [.5 .5 .5], 'LineWidth', 2);
 
-h(3) = bar(4, I_Gen, 'BarWidth', 0.4);
+b2 = bar(fliplr(w_s_o)*20/6, 'FaceColor', C(1, :), 'BarWidth', 0.2);
+
+h=bar(1, fliplr(w_s_o(3))*20/6, 'FaceColor', C(1, :), 'BarWidth', 0.2)
+% set(h,'EdgeColor', 'red', 'FaceColor', C(1, :), 'LineWidth', 2);
+
+b3 = bar(4, I_Gen, 'BarWidth', 0.4, 'FaceColor', [0.9290 0.6940 0.1250]);
+% h = bar(4, I_Gen, 'BarWidth', 0.4, 'FaceColor', [0.9290 0.6940 0.1250]);
+% set(h,'EdgeColor', 'red', 'FaceColor', [0.9290 0.6940 0.1250], 'LineWidth', 2);
+
 
 ylabel('Incidence')
 xlabel('Time, $t$ (days)')
 
 xticks([1 2 3 4])
-xticklabels({'M', 'Tu', 'W', 'Th'})
+xticklabels({'F', 'Sa', 'Su', 'M'})
 
-legend(h([1 2 3]), {"Incidence", "Non-normalised"+newline+"GI", "$\mathrm{E}[I_t|R_t=1]$"}, 'Position', [0.246 0.202 0.15 0.25], 'FontSize', 18)
+legend([b1 b2 b3], {"Incidence", "Non-normalised"+newline+"GI", "$\mathrm{E}[I_t|R_t=1]$"}, 'Position', [0.2 0.62 0.15 0.25], 'FontSize', 18)
 
 
+
+% ylabel("GI probability")
+% 
+% xlabel('Interval (days)')
+% hYLabel = get(gca,'YLabel');
+% hYLabel.Position(1) = -1.62;
 
 
 ha = annotation('arrow');
@@ -113,19 +133,19 @@ ha.HeadWidth = 40;
 ha.Position = [5.23 2.8 0 -0.44]
 ha.Color = [.5 .5 .5];
 
-hb = annotation('arrow');
-ax.Clipping = 'off';
+% hb = annotation('arrow');
+% ax.Clipping = 'off';
 
-
-hb.Parent = hf.CurrentAxes;
-hb.HeadStyle = 'plain';
-hb.LineWidth = 10;
-hb.HeadLength = 20;
-hb.HeadWidth = 40;
-% hb.X = [-1.6 0];
-% hb.Y = [4 4];
-hb.Position = [-1.8 4.05 0.85 0];
-hb.Color = [.5 .5 .5];
+% 
+% hb.Parent = hf.CurrentAxes;
+% hb.HeadStyle = 'plain';
+% hb.LineWidth = 10;
+% hb.HeadLength = 20;
+% hb.HeadWidth = 40;
+% % hb.X = [-1.6 0];
+% % hb.Y = [4 4];
+% hb.Position = [-1.8 4.05 0.85 0];
+% hb.Color = [.5 .5 .5];
 % set(hf, 'Position', [150 100 200 200])
 
 
@@ -136,9 +156,9 @@ Printer = 0;
 if Printer == 0
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 20 15], 'PaperUnits', 'centimeters', 'PaperSize', [15 20]);
-saveas(gcf, 'R_t_Inference_Schematic.eps')
+saveas(gcf, 'R_t_Inference_Schematic_Norm.eps')
 
-export_fig R_t_Inference_Schematic.eps -eps -r300 -painters -transparent
+export_fig R_t_Inference_Schematic_Norm.eps -eps -r300 -painters -transparent
 
 end
 

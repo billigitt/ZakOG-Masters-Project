@@ -383,7 +383,7 @@ set(gca,'XTickLabel', {'1'});
 xlabel('True $R_t$')
 set(gca, 'FontSize', 18)
 
-ylabel('$\frac{\mathrm{Actual \: Inference}}{\mathrm{Perfect \: Inference}}$', 'FontSize', 22)
+ylabel('$\frac{\mathrm{Actual \: Inference}}{\mathrm{Ideal \: Inference}}$', 'FontSize', 22)
 
 
 hYLabel = get(gca,'YLabel');
@@ -477,6 +477,48 @@ if Printer == 1
 %Save figure
 set(gcf, 'Units', 'centimeters', 'Position', [0 0 28 12], 'PaperUnits', 'centimeters', 'PaperSize', [28 12]);
 saveas(gcf, 'Var_Sigma_Schem_Pres.pdf')
+% export_fig Delta_Eq_1_Schematic.eps -eps -r300 -painters -transparent
+
+end
+
+
+%%
+figure(6)
+clf
+axes('Position',[0.23 0.15 0.7 0.74]);
+
+h = plot(t_long, y9+1, 'k--');
+
+hold on
+
+plot(t_long, y6, 'color', C(2, :))
+
+plot(t_long, y8*0.5+1, 'color', C(2, :)*1/0.74)
+plot(t, y2, 'color', C(2, :)*0.8)
+axis([-5 5 -1.1 2.1])
+yline(1, 'LineStyle', '--')
+yticks([1])
+set(gca,'YTickLabel', {'1'});
+xticks([0])
+set(gca,'XTickLabel', {'1'});
+
+
+xlabel('True $R_t$')
+set(gca, 'FontSize', 18)
+
+ylabel('$\frac{\mathrm{Actual \: Inference}}{\mathrm{Ideal \: Inference}}$', 'FontSize', 22)
+
+legend(h, "Current belief"+newline+"about estimation bias", 'Location', 'SouthWest')
+
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+hYLabel.Position(1) = -6.65;
+hYLabel.Position(2) = 0.4;
+
+if Printer == 1
+%Save figure
+set(gcf, 'Units', 'centimeters', 'Position', [0 0 18 12], 'PaperUnits', 'centimeters', 'PaperSize', [18 12]);
+saveas(gcf, 'Summary_Schematic.pdf')
 % export_fig Delta_Eq_1_Schematic.eps -eps -r300 -painters -transparent
 
 end

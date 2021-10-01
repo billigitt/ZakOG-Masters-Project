@@ -1,0 +1,22 @@
+\documentclass[border=5]{standalone}
+\usepackage{tikz}
+\newcommand\shadetext[2][]{%
+	\setbox0=\hbox{{\special{pdf:literal 7 Tr }#2}}%
+	\tikz[baseline=0]\path [#1] \pgfextra{\rlap{\copy0}} (0,-\dp0) rectangle (\wd0,\ht0);%
+}
+
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usepackage{pagecolor}
+\pagecolor{black}
+\definecolor{silver}{rgb}{0.75, 0.75, 0.75}
+\definecolor{ams}{rgb}{0.43, 0.5, 0.5}
+\usepackage{bm}
+\begin{document}
+	\begin{tikzpicture}[every text node part/.style={align=center}]
+	\node (Origin) {\shadetext[left color=white, right color=black, middle color=silver, shading angle=120]{\Huge $\boldsymbol{\Delta}$}};
+	\node (Data) [below = 0.1cm of  Origin] {\tiny data};
+	\node (Data) [above = 0.1cm of  Origin] {\tiny data};
+	\end{tikzpicture}
+
+\end{document}
